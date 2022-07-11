@@ -2,6 +2,7 @@ import mcstatus
 from time import sleep
 import datetime
 import os
+import pathlib
 
 
 
@@ -27,21 +28,19 @@ class ServerMonitor:
     """
     Class for monitoring one server.
 
-    :param address Address to query
-    :type str
-    :param query_time Time between each query in seconds. (default is 30)
-    :type int
-    :param verbose Should the server monitor print out debug / map information to stdout
-    :type bool
-
     Methods:
     tick()
-        Should be ran once every second. It queries the server, and if a new map is found, adds a Match object to the
-        queue
-    pull_queue()
-        Returns all maps in the queue and clears the queue
+        Should be ran once every second. It queries the server, and if a new map is found, it sets the pending_map to
+        the Match object
+    get_pending_map()
+        returns the pending map
     """
     def __init__(self, address, query_time=30, verbose=False):
+        """
+        :param address Address to query
+        :param query_time Time between each query in seconds. (default is 30)
+        :param verbose Should the server monitor print out debug / map information to stdout
+        """
         self._address = address
         self._query_time = query_time
         self._verbose = verbose
@@ -52,7 +51,8 @@ class ServerMonitor:
         self._starting_players = 0
         self._query_cooldown = 0
 
-        self._queue = []  # List for storing maps
+        self._pending_map = None
+        self._is_pending = False
 
         self._server = mcstatus.JavaServer(address)
 
@@ -77,16 +77,18 @@ class ServerMonitor:
                 if self._verbose: print(f"New map detected. {self._prev_map} >> {active_map_name}")
 
                 # Create the Match object, and print some data if verbose
-                self._queue.append(Match(self._start_time, self._current_playtime, active_map_name,
-                                         self._starting_players, status.players.online))
+                self._pending_map = Match(self._start_time, self._current_playtime*self._query_time,
+                                          active_map_name, self._starting_players,
+                                          status.players.online)
+                self._is_pending = True
+
                 if self._verbose:
-                    os.system('cls' if os.name == 'nt' else 'clear')
                     print(f"------- Finished map -------\n > {self._prev_map} <")
                     print(f"Start time: {str(self._start_time)}")
-                    print(f"Playtime: {self._current_playtime * self._query_time}")
+                    print(f"Playtime: {self._current_playtime * self._query_time} seconds.")
                     print(f"Players at end: {status.players.online} \
                             [{(self._starting_players - status.players.online):+g}]")
-                    print(f"---------------------------------\n There are {len(self._queue)} maps in queue.")
+                    print(f"---------------------------------\n")
 
 
                 # Reset the match-tracking variables
@@ -98,21 +100,94 @@ class ServerMonitor:
                 if self._verbose: print("No map change detected.")
                 self._current_playtime += 1
 
-    def pull_queue(self):
-        if len(self._queue) < 0:
-            to_return = self._queue
-            self._queue = []
-            if self._verbose: print(f"Pulled {len(to_return)} maps from the queue")
-            return to_return
+    def get_pending(self):
+        if self._is_pending:
+            self._is_pending = False
+            return self._pending_map
         else:
-            if self._verbose: print(f"No maps in queue")
-            return []
+            return None
+
+
+
+class DataWriter:
+    """
+    Class for writing data to the disk. Handles writing the data for one server.
+    """
+    def __init__(self, server_name, verbose=False):
+        """
+        :param server_name Name of the server. Used in naming the folder.
+        :param verbose Display debug information (Default is False)
+        """
+        self._history_file = pathlib.Path(f"save/{server_name}/map_history")
+        self._map_data = pathlib.Path(f"save/{server_name}/map_data")
+        self._verbose = verbose
+
+        # Make sure files exists
+        pathlib.Path(f"save/{server_name}").mkdir(parents=True, exist_ok=True)
+        self._history_file.touch()
+        self._map_data.touch()
+
+
+    def write_data(self, match):
+        """
+        :param match: The Match object to write
+        """
+        # Writing map history
+        if self._verbose: print(f"Starting the save - Map History")
+        with open(self._history_file, "a") as file:
+            name = match.name
+            stime = str(match.start_date)
+            ptime = match.playtime
+            splayers = match.start_players
+            pchange = match.get_player_change()
+            file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
+
+        # Writing map data
+        if self._verbose: print(f"Staring the save - Map Data")
+        with open(self._map_data, "r") as file:
+            data = file.read()
+
+        new_data = ""
+        is_written = False
+        for line in data.splitlines():
+            split = line.split(" | ")
+            mapname = split[0]
+            playcount = int(split[1])
+            if mapname == match.name:
+                is_written = True
+                new_data += f"{mapname} | {playcount+1}\n"
+            else:
+                new_data += f"{mapname} | {playcount}\n"
+        if not is_written:
+            new_data += f"{match.name} | 1\n"
+
+
+        with open(self._map_data, "w") as file:
+            print(f"Writing >> {new_data}")
+            file.write(new_data)
+
+        if self._verbose: print("Write finished.")
 
 
 
 if __name__ == "__main__":
+    # Example run
+    """
     occmonitor = ServerMonitor("play.oc.tc", verbose=True)
+    occwriter = DataWriter("occ", verbose=True)
 
+    i = 300
     while True:
         occmonitor.tick()
+        i -= 1
+        if i == 0:
+            i = 300
+            queue = occmonitor.pull_queue()
+            occwriter.write_data(queue)
+
         sleep(1)
+    """
+    # Test run
+    testWriter = DataWriter("test", verbose=True)
+    a = Match(datetime.datetime.now(), 300, "Map2", 10, 14)
+    testWriter.write_data(a)
