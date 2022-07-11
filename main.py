@@ -45,7 +45,7 @@ class ServerMonitor:
         self._query_time = query_time
         self._verbose = verbose
 
-        self._prev_map = "Initializing"
+        self._prev_map = "SYS_INIT"
         self._start_time = datetime.datetime.now()  # This will store the time the last map started.
         self._current_playtime = 0
         self._starting_players = 0
@@ -78,7 +78,7 @@ class ServerMonitor:
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(self._start_time, self._current_playtime*self._query_time,
-                                          active_map_name, self._starting_players,
+                                          self._prev_map, self._starting_players,
                                           status.players.online)
                 self._is_pending = True
 
@@ -132,62 +132,54 @@ class DataWriter:
         """
         :param match: The Match object to write
         """
-        # Writing map history
-        if self._verbose: print(f"Starting the save - Map History")
-        with open(self._history_file, "a") as file:
-            name = match.name
-            stime = str(match.start_date)
-            ptime = match.playtime
-            splayers = match.start_players
-            pchange = match.get_player_change()
-            file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
+        if match is None:
+            pass
+        else:
+            # Writing map history
+            if self._verbose: print(f"Starting the save - Map History")
+            with open(self._history_file, "a") as file:
+                name = match.name
+                stime = str(match.start_date)
+                ptime = match.playtime
+                splayers = match.start_players
+                pchange = match.get_player_change()
+                file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
-        # Writing map data
-        if self._verbose: print(f"Staring the save - Map Data")
-        with open(self._map_data, "r") as file:
-            data = file.read()
+            # Writing map data
+            if self._verbose: print(f"Staring the save - Map Data")
+            with open(self._map_data, "r") as file:
+                data = file.read()
 
-        new_data = ""
-        is_written = False
-        for line in data.splitlines():
-            split = line.split(" | ")
-            mapname = split[0]
-            playcount = int(split[1])
-            if mapname == match.name:
-                is_written = True
-                new_data += f"{mapname} | {playcount+1}\n"
-            else:
-                new_data += f"{mapname} | {playcount}\n"
-        if not is_written:
-            new_data += f"{match.name} | 1\n"
+            new_data = ""
+            is_written = False
+            for line in data.splitlines():
+                split = line.split(" | ")
+                mapname = split[0]
+                playcount = int(split[1])
+                if mapname == match.name:
+                    is_written = True
+                    new_data += f"{mapname} | {playcount+1}\n"
+                else:
+                    new_data += f"{mapname} | {playcount}\n"
+            if not is_written:
+                new_data += f"{match.name} | 1\n"
 
 
-        with open(self._map_data, "w") as file:
-            print(f"Writing >> {new_data}")
-            file.write(new_data)
+            with open(self._map_data, "w") as file:
+                file.write(new_data)
 
-        if self._verbose: print("Write finished.")
+            if self._verbose: print("Write finished.")
 
 
 
 if __name__ == "__main__":
     # Example run
-    """
+
     occmonitor = ServerMonitor("play.oc.tc", verbose=True)
     occwriter = DataWriter("occ", verbose=True)
 
-    i = 300
     while True:
         occmonitor.tick()
-        i -= 1
-        if i == 0:
-            i = 300
-            queue = occmonitor.pull_queue()
-            occwriter.write_data(queue)
-
+        match = occmonitor.get_pending()
+        occwriter.write_data(match)
         sleep(1)
-    """
-    # Test run
-    testWriter = DataWriter("test", verbose=True)
-    a = Match(datetime.datetime.now(), 300, "Map2", 10, 14)
-    testWriter.write_data(a)
