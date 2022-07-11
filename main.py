@@ -38,6 +38,8 @@ class ServerMonitor:
     tick()
         Should be ran once every second. It queries the server, and if a new map is found, adds a Match object to the
         queue
+    pull_queue()
+        Returns all maps in the queue and clears the queue
     """
     def __init__(self, address, query_time=30, verbose=False):
         self._address = address
@@ -56,14 +58,17 @@ class ServerMonitor:
 
     def tick(self):
         # Check if the query cooldown expired, if yes reset it and query the server
-        if self._query_cooldown < 0:
+        if self._query_cooldown > 0:
             self._query_cooldown -= 1
         else:
+            if self._verbose:
+                print(f"Querying server. [{self._current_playtime}]")
+
             # Reset cooldown
             self._query_cooldown = self._query_time
 
             # Query the server
-            status = server.status()
+            status = self._server.status()
             motd = status.description
             active_map_name = motd.splitlines()[1][6:-4]  # Get the map name out from OCC's MOTD
 
@@ -75,11 +80,14 @@ class ServerMonitor:
                 self._queue.append(Match(self._start_time, self._current_playtime, active_map_name,
                                          self._starting_players, status.players.online))
                 if self._verbose:
-                    print(f"------- Last finished map -------\n > {active_map_name} <")
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print(f"------- Finished map -------\n > {self._prev_map} <")
                     print(f"Start time: {str(self._start_time)}")
                     print(f"Playtime: {self._current_playtime * self._query_time}")
                     print(f"Players at end: {status.players.online} \
                             [{(self._starting_players - status.players.online):+g}]")
+                    print(f"---------------------------------\n There are {len(self._queue)} maps in queue.")
+
 
                 # Reset the match-tracking variables
                 self._prev_map = active_map_name
@@ -87,36 +95,24 @@ class ServerMonitor:
                 self._current_playtime = 0
             else:
                 # Add one to the current playtime. Time will be obtained by multiplying this with the query time
+                if self._verbose: print("No map change detected.")
                 self._current_playtime += 1
 
+    def pull_queue(self):
+        if len(self._queue) < 0:
+            to_return = self._queue
+            self._queue = []
+            if self._verbose: print(f"Pulled {len(to_return)} maps from the queue")
+            return to_return
+        else:
+            if self._verbose: print(f"No maps in queue")
+            return []
 
 
-# Previous code for reference, rewrite not complete.
-"""
-while True:
 
-    status = server.status()
-    motd = status.description
+if __name__ == "__main__":
+    occmonitor = ServerMonitor("play.oc.tc", verbose=True)
 
-    active_map = motd.splitlines()[1][6:-4]
-
-    if prev_map != active_map:
-        print("New map detected.")
-
-        with open("data.txt", "a") as file:
-            towrite = f"{prev_map} | {playtime * QUERY_TIME} | {status.players.online} | {start_players}\n"
-            print("Saving data " + towrite)
-            file.write(towrite)
-
-        prev_map = active_map
-        start_players = status.players.online
-        playtime = 0
-    else:
-        playtime += 1
-
-    playtime_hr = datetime.timedelta(seconds=QUERY_TIME*playtime)
-
-    print(f"Current map: {active_map} | Playtime: {playtime_hr} | Players {status.players.online} [Players at start: {start_players}, {status.players.online - start_players} change]")
-    sleep(QUERY_TIME)
-    os.system('cls' if os.name == 'nt' else 'clear')
-"""
+    while True:
+        occmonitor.tick()
+        sleep(1)
