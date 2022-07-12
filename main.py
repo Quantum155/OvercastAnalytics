@@ -1,7 +1,6 @@
 import mcstatus
 from time import sleep
 import datetime
-import os
 import pathlib
 
 
@@ -103,9 +102,15 @@ class ServerMonitor:
             self._query_cooldown = self._query_time
 
             # Query the server
-            status = self._server.status()
-            motd = status.description
-            active_map_name = motd.splitlines()[1][6:-4]  # Get the map name out from OCC's MOTD
+            try:
+                status = self._server.status()
+                motd = status.description
+                players = status.players.online
+                active_map_name = motd.splitlines()[1][6:-4]  # Get the map name out from OCC's MOTD
+            except Exception as ex:  # Not sure of every exception that can be raised
+                print(f"[ERROR] Unable to query server: {ex}")
+                active_map_name = "SYS_QUERYERROR"
+                players = 0
 
             # Check if the current map is different from the one we got last query
             if self._prev_map != active_map_name:
@@ -114,21 +119,21 @@ class ServerMonitor:
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(self._start_time, self._current_playtime*self._query_time,
                                           self._prev_map, self._starting_players,
-                                          status.players.online)
+                                          players)
                 self._is_pending = True
 
                 if self._verbose:
                     print(f"------- Finished map -------\n > {self._prev_map} <")
                     print(f"Start time: {str(self._start_time)}")
                     print(f"Playtime: {self._current_playtime * self._query_time} seconds.")
-                    print(f"Players at end: {status.players.online} \
-                            [{(self._starting_players - status.players.online):+g}]")
+                    print(f"Players at end: {players} \
+                            [{(self._starting_players - players):+g}]")
                     print(f"---------------------------------\n")
 
 
                 # Reset the match-tracking variables
                 self._prev_map = active_map_name
-                self._starting_players = status.players.online
+                self._starting_players = players
                 self._current_playtime = 0
             else:
                 # Add one to the current playtime. Time will be obtained by multiplying this with the query time
