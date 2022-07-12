@@ -24,6 +24,41 @@ class Match:
         return self.start_players - self.end_players
 
 
+
+class Map:
+    """
+    Class to store data related to a map (Average times etc)
+    Also has functions to calculate the data.
+    """
+    def __init__(self, map_name, average_playtime=None, average_player_change=None):
+        self.map_name = map_name
+        self.average_playtime = average_playtime
+        self.average_player_change = average_player_change
+
+        self._playtimes = []
+        self._player_changes = []
+
+    def calculate_average_playtimes(self):
+        if len(self._playtimes) > 0:
+            self.average_playtime = sum(self._playtimes) / len(self._playtimes)
+        else:
+            pass
+
+    def calculate_average_player_changes(self):
+        if len(self._player_changes) > 0:
+            print(f"Calculating player_changes for map {self.map_name}: {self._player_changes}")
+            self.average_player_change = sum(self._player_changes) / len(self._player_changes)
+        else:
+            pass
+
+    def add_playtime(self, time):
+        self._playtimes.append(time)
+
+    def add_player_change(self, change):
+        self._player_changes.append(change)
+
+
+
 class ServerMonitor:
     """
     Class for monitoring one server.
@@ -171,15 +206,91 @@ class DataWriter:
             if self._verbose: print("Write finished.")
 
 
+class DataAnalyzer:
+    """
+    Class for analyzing the map_history data for one tracked server, and then "caching" it in map_average_cache.
+    """
+    def __init__(self, server_save_name, analyze_cooldown=86400):
+        """
+        :param server_save_name The name of the folder the server data is saved to (save/<name>)
+        :param analyze_cooldown: Run caching every x seconds
+        """
+        self._server_save_name = server_save_name
+        self._analyze_cooldown = analyze_cooldown
+        self._cooldown = 86400
+
+        self._map_history = pathlib.Path(f"save/{self._server_save_name}/map_history")
+        self._save_file = pathlib.Path(f"save/{self._server_save_name}/map_average_cache")
+
+        self._maps = []  # This list will store the Match objects that will be returned after reading the file
+
+        # Make sure files exist
+        pathlib.Path(f"save/{self._server_save_name}").mkdir(parents=True, exist_ok=True)
+        self._map_history.touch()
+        self._save_file.touch()
+
+    def tick(self):
+        if self._cooldown > 0:
+            self._cooldown -= 1
+        else:
+            # Calculate average datas for each map (Average playtime, playercount, playercount change)
+            # Read each map line by line from map_history, construct a list of Match objects
+            # Then calculate the averages and write them to a file.
+            # If we run this script for 1 year then the map_history will only be around 1 MB,
+            # so we don't have to worry about loading too much stuff into memory.
+            self._cooldown = self._analyze_cooldown
+
+            # Scan the file
+            with open(self._map_history, "r") as file:
+                for line in file:
+                    split = line.split(" | ")
+                    name = split[0]
+                    playtime = int(split[2])
+                    change = int(split[4])
+                    # check if a Map with a matching name exists in self._maps
+                    found = False
+                    for map_ in self._maps:
+                        if map_.map_name == name:
+                            map_.add_playtime(playtime)
+                            map_.add_player_change(change)
+                            found = True
+
+                    if not found:
+                        map_to_add = Map(name)
+                        map_to_add.add_playtime(playtime)
+                        map_to_add.add_player_change(change)
+                        self._maps.append(map_to_add)
+
+            # Make the calculations
+            for map_ in self._maps:
+                map_.calculate_average_playtimes()
+                map_.calculate_average_player_changes()
+
+            # Get what to write
+            to_write = ""
+            for map_ in self._maps:
+                name = map_.map_name
+                playtime = map_.average_playtime
+                player_change = map_.average_player_change
+                to_write += f"{name} | {playtime} | {player_change}\n"
+
+            # Write to disk
+            with open(self._save_file, "w") as file:
+                file.write(to_write)
+
+
+
 
 if __name__ == "__main__":
     # Example run
 
     occmonitor = ServerMonitor("play.oc.tc", verbose=True)
     occwriter = DataWriter("occ", verbose=True)
+    occanalyzer = DataAnalyzer("occ")
 
     while True:
         occmonitor.tick()
         match = occmonitor.get_pending()
         occwriter.write_data(match)
+        occanalyzer.tick()
         sleep(1)
