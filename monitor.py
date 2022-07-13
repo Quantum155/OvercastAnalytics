@@ -181,7 +181,7 @@ class DataWriter:
         if self._first_write.is_file():
             pass
         else:
-            with open(self._first_write) as file:
+            with open(self._first_write, "w") as file:
                 file.write(str(datetime.datetime.now()))
 
 
