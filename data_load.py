@@ -52,3 +52,8 @@ def load_server_data(directory):
     maps_tracked = count + 1 - invalid
 
     return monitoring_since, last_cache, maps_tracked
+
+
+def load_active_map(directory):
+    with open((directory / "active_map"), "r") as file:
+        return file.read()
