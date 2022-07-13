@@ -215,14 +215,14 @@ class DataAnalyzer:
     """
     Class for analyzing the map_history data for one tracked server, and then "caching" it in map_average_cache.
     """
-    def __init__(self, server_save_name, analyze_cooldown=86400):
+    def __init__(self, server_save_name, analyze_cooldown=43200):
         """
         :param server_save_name The name of the folder the server data is saved to (save/<name>)
         :param analyze_cooldown: Run caching every x seconds
         """
         self._server_save_name = server_save_name
         self._analyze_cooldown = analyze_cooldown
-        self._cooldown = 86400
+        self._cooldown = 0
 
         self._map_history = pathlib.Path(f"save/{self._server_save_name}/map_history")
         self._save_file = pathlib.Path(f"save/{self._server_save_name}/map_average_cache")
