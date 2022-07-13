@@ -45,7 +45,6 @@ class Map:
 
     def calculate_average_player_changes(self):
         if len(self._player_changes) > 0:
-            print(f"Calculating player_changes for map {self.map_name}: {self._player_changes}")
             self.average_player_change = sum(self._player_changes) / len(self._player_changes)
         else:
             pass
@@ -244,6 +243,7 @@ class DataAnalyzer:
             # If we run this script for 1 year then the map_history will only be around 1 MB,
             # so we don't have to worry about loading too much stuff into memory.
             self._cooldown = self._analyze_cooldown
+            print("Starting map average calculations.")
 
             # Scan the file
             with open(self._map_history, "r") as file:
@@ -282,6 +282,8 @@ class DataAnalyzer:
             # Write to disk
             with open(self._save_file, "w") as file:
                 file.write(to_write)
+
+        print("Calculations completed")
 
 
 
