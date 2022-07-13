@@ -2,6 +2,11 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
+MONITOR_VERSION = 1
+
+
+def get_monitor_version():
+    return MONITOR_VERSION
 
 
 
@@ -146,6 +151,9 @@ class ServerMonitor:
         else:
             return None
 
+    def get_active(self):
+        return self._prev_map
+
 
 
 class DataWriter:
@@ -159,17 +167,20 @@ class DataWriter:
         """
         self._history_file = pathlib.Path(f"save/{server_name}/map_history")
         self._map_data = pathlib.Path(f"save/{server_name}/map_data")
+        self._active_map = pathlib.Path(f"save/{server_name}/active_map")
         self._verbose = verbose
 
         # Make sure files exists
         pathlib.Path(f"save/{server_name}").mkdir(parents=True, exist_ok=True)
         self._history_file.touch()
         self._map_data.touch()
+        self._active_map.touch()
 
 
-    def write_data(self, match):
+    def write_data(self, match: Match, active_map: str):
         """
         :param match: The Match object to write
+        :param active_map: The name of the active map
         """
         if match is None:
             pass
@@ -207,6 +218,11 @@ class DataWriter:
             with open(self._map_data, "w") as file:
                 file.write(new_data)
 
+            if self._verbose: print(f"Starting the save - Active map")
+
+            with open(self._active_map, "w") as file:
+                file.write(active_map)
+
             if self._verbose: print("Write finished.")
 
 
@@ -225,6 +241,7 @@ class DataAnalyzer:
 
         self._map_history = pathlib.Path(f"save/{self._server_save_name}/map_history")
         self._save_file = pathlib.Path(f"save/{self._server_save_name}/map_average_cache")
+        self._last_cache_save = pathlib.Path(f"save/{self._server_save_name}/last_cache_time")
 
         self._maps = []  # This list will store the Match objects that will be returned after reading the file
 
@@ -232,6 +249,7 @@ class DataAnalyzer:
         pathlib.Path(f"save/{self._server_save_name}").mkdir(parents=True, exist_ok=True)
         self._map_history.touch()
         self._save_file.touch()
+        self._last_cache_save.touch()
 
     def tick(self):
         if self._cooldown > 0:
@@ -284,6 +302,8 @@ class DataAnalyzer:
                 file.write(to_write)
 
             print("Calculations completed")
+            with open(self._last_cache_save, "w") as file:
+                file.write(str(datetime.datetime.now()))
 
 
 
@@ -298,6 +318,7 @@ if __name__ == "__main__":
     while True:
         occmonitor.tick()
         match = occmonitor.get_pending()
-        occwriter.write_data(match)
+        active = occmonitor.get_active()
+        occwriter.write_data(match, active)
         occanalyzer.tick()
         sleep(1)
