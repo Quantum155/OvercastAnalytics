@@ -283,7 +283,7 @@ class DataAnalyzer:
             with open(self._save_file, "w") as file:
                 file.write(to_write)
 
-        print("Calculations completed")
+            print("Calculations completed")
 
 
 
