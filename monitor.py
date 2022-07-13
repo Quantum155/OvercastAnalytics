@@ -168,6 +168,7 @@ class DataWriter:
         self._history_file = pathlib.Path(f"save/{server_name}/map_history")
         self._map_data = pathlib.Path(f"save/{server_name}/map_data")
         self._active_map = pathlib.Path(f"save/{server_name}/active_map")
+        self._first_write = pathlib.Path(f"save/{server_name}/first_write")
         self._verbose = verbose
 
         # Make sure files exists
@@ -175,6 +176,13 @@ class DataWriter:
         self._history_file.touch()
         self._map_data.touch()
         self._active_map.touch()
+
+        # Check if first_write exists, if yes then pass, if not then create it.
+        if self._first_write.is_file():
+            pass
+        else:
+            with open(self._first_write) as file:
+                file.write(str(datetime.datetime.now()))
 
 
     def write_data(self, match: Match, active_map: str):
@@ -312,8 +320,8 @@ if __name__ == "__main__":
     # Example run
 
     occmonitor = ServerMonitor("play.oc.tc", verbose=True)
-    occwriter = DataWriter("occ", verbose=True)
-    occanalyzer = DataAnalyzer("occ")
+    occwriter = DataWriter("Overcast Community", verbose=True)
+    occanalyzer = DataAnalyzer("Overcast Community")
 
     while True:
         occmonitor.tick()
