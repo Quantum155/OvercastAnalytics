@@ -20,7 +20,7 @@ class Match:
         return self.start_date + datetime.timedelta(seconds=self.playtime)
 
     def get_player_change(self):
-        return self.start_players - self.end_players
+        return self.end_players - self.start_players
 
 
 
@@ -127,7 +127,7 @@ class ServerMonitor:
                     print(f"Start time: {str(self._start_time)}")
                     print(f"Playtime: {self._current_playtime * self._query_time} seconds.")
                     print(f"Players at end: {players} \
-                            [{(self._starting_players - players):+g}]")
+                            [{players - self._starting_players:+g}]")
                     print(f"---------------------------------\n")
 
 
