@@ -17,6 +17,9 @@ app = flask.Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
+    """
+    This gets information about the API and Monitor.
+    """
     return flask.jsonify({"api_version": API_VERSION,
                           "monitor_version": get_monitor_version(),
                           "monitored_server_count": len(MONITOR_SERVERS),
@@ -25,6 +28,11 @@ def index():
 
 @app.route("/<string:server_name>/", methods=["GET"])
 def server_data(server_name):
+    """
+    Return information about a tracked server.
+    :param server_name: Name of the server
+    """
+    # Make sure accessing that data is allowed
     if not has_access(server_name): return flask.jsonify("Requested server not found or forbidden"), 403
 
     directory = pathlib.Path(f"save/{server_name}")
@@ -42,6 +50,11 @@ def server_data(server_name):
 
 @app.route("/<string:server_name>/maps/<string:map_name>", methods=["GET"])
 def map_data(server_name, map_name):
+    """
+    Returns data about a specific map on a server
+    :param server_name: Name of the server
+    :param map_name: Name of the map
+    """
     if not has_access(server_name): return flask.jsonify("Requested server not found or forbidden"), 403
 
     directory = pathlib.Path(f"save/{server_name}")
