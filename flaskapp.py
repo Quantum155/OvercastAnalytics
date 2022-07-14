@@ -26,7 +26,7 @@ def index():
                           "monitored_servers": MONITOR_SERVERS})
 
 
-@app.route("/<string:server_name>", methods=["GET"])
+@app.route("/<string:server_name>/", methods=["GET"])
 def server_data(server_name):
     """
     Return information about a tracked server.
@@ -48,7 +48,7 @@ def server_data(server_name):
         return flask.jsonify("Requested server not found"), 404
 
 
-@app.route("/<string:server_name>/current_map")
+@app.route("/<string:server_name>/current_map/")
 def current_map(server_name):
     """
     Returns the currently playing map
@@ -65,7 +65,7 @@ def current_map(server_name):
         return flask.jsonify("Requested server not found"), 404
 
 
-@app.route("/<string:server_name>/maps/<string:map_name>", methods=["GET"])
+@app.route("/<string:server_name>/maps/<string:map_name>/", methods=["GET"])
 def map_data(server_name, map_name):
     """
     Returns data about a specific map on a server
