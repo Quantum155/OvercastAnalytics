@@ -318,7 +318,7 @@ class DataAnalyzer:
 
 if __name__ == "__main__":
     # Example run
-    print(f"Started - Saving to {pathlib.Path('save/')} ")
+    print(f"Started - Saving to {str(pathlib.Path('save/'))} ")
 
     occmonitor = ServerMonitor("play.oc.tc", verbose=True)
     occwriter = DataWriter("Overcast Community", verbose=True)
