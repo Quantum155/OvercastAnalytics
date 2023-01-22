@@ -3,7 +3,7 @@ import pathlib
 from monitor import get_monitor_version
 from data_load import *
 
-API_VERSION = 2
+API_VERSION = 3
 MONITOR_SERVERS = ["Overcast Community"]  # Folders inside /save/ from where the API can serve data.
 
 
@@ -39,11 +39,13 @@ def server_data(server_name):
 
     if directory.is_dir():
         monitoring_since, last_cache, maps_tracked = load_server_data(directory)
+        player_sample = load_players(directory)
         # Return response
         return flask.jsonify({"name": server_name,
                               "monitoring_since": monitoring_since,
                               "last_cache_update": last_cache,
-                              "maps_tracked": maps_tracked})
+                              "maps_tracked": maps_tracked,
+                              "player_sample": player_sample})
     else:
         return flask.jsonify("Requested server not found"), 404
 

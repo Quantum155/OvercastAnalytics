@@ -57,3 +57,12 @@ def load_server_data(directory):
 def load_active_map(directory):
     with open((directory / "active_map"), "r") as file:
         return file.read()
+
+
+def load_players(directory):
+    with open((directory / "online"), "r") as file:
+        players = []
+        for line in file.readlines():
+            players.append(line.strip())
+        return players
+

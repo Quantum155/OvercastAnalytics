@@ -2,12 +2,26 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
-MONITOR_VERSION = 1
+MONITOR_VERSION = 2
 
 
 def get_monitor_version():
     return MONITOR_VERSION
 
+
+class TimedData:
+    """
+    Basic class for storing everything that needs to be saved periodically, rather than at the end of the game
+    """
+    def __init__(self, online_players: list, is_complete: False):
+        self.online_players = online_players
+        self._is_complete = is_complete  # Is the data complete (as a result of a query instead of a status check)
+
+    def get_player_names(self):
+        player_names = []
+        for player in self.online_players:
+            player_names.append(player.name)
+        return player_names
 
 
 class Match:
@@ -61,7 +75,6 @@ class Map:
         self._player_changes.append(change)
 
 
-
 class ServerMonitor:
     """
     Class for monitoring one server.
@@ -94,6 +107,11 @@ class ServerMonitor:
 
         self._server = mcstatus.JavaServer(address)
 
+        self._online_players = []
+
+        self._timed_data = None
+        self._is_timed_data_pending = False
+
     def tick(self):
         # Check if the query cooldown expired, if yes reset it and query the server
         if self._query_cooldown > 0:
@@ -110,11 +128,17 @@ class ServerMonitor:
                 status = self._server.status()
                 motd = status.description
                 players = status.players.online
+                self._online_players = status.players.sample
                 active_map_name = motd.splitlines()[1][6:-4]  # Get the map name out from OCC's MOTD
             except Exception as ex:  # Not sure of every exception that can be raised
                 print(f"[ERROR] Unable to query server: {ex}")
                 active_map_name = "SYS_QUERYERROR"
                 players = 0
+                self._online_players = []
+
+            # Create timed objects
+            self._timed_data = TimedData(self._online_players, is_complete=False)
+            self._is_timed_data_pending = True
 
             # Check if the current map is different from the one we got last query
             if self._prev_map != active_map_name:
@@ -154,6 +178,12 @@ class ServerMonitor:
     def get_active(self):
         return self._prev_map
 
+    def get_timed(self):
+        if self._is_timed_data_pending:
+            self._is_timed_data_pending = False
+            return self._timed_data
+        else:
+            return None
 
 
 class DataWriter:
@@ -169,6 +199,8 @@ class DataWriter:
         self._map_data = pathlib.Path(f"save/{server_name}/map_data")
         self._active_map = pathlib.Path(f"save/{server_name}/active_map")
         self._first_write = pathlib.Path(f"save/{server_name}/first_write")
+        self._online_players = pathlib.Path(f"save/{server_name}/online")
+        self._misc_data = pathlib.Path(f"save/{server_name}/misc")
         self._verbose = verbose
 
         # Make sure files exists
@@ -176,6 +208,8 @@ class DataWriter:
         self._history_file.touch()
         self._map_data.touch()
         self._active_map.touch()
+        self._misc_data.touch()
+        self._online_players.touch()
 
         # Check if first_write exists, if yes then pass, if not then create it.
         if self._first_write.is_file():
@@ -183,7 +217,6 @@ class DataWriter:
         else:
             with open(self._first_write, "w") as file:
                 file.write(str(datetime.datetime.now()))
-
 
     def write_data(self, match: Match, active_map: str):
         """
@@ -222,7 +255,6 @@ class DataWriter:
             if not is_written:
                 new_data += f"{match.name} | 1\n"
 
-
             with open(self._map_data, "w") as file:
                 file.write(new_data)
 
@@ -232,6 +264,16 @@ class DataWriter:
                 file.write(active_map)
 
             if self._verbose: print("Write finished.")
+
+    def write_timeds(self, timed: TimedData):
+        if timed is None:
+            pass
+        else:
+            if self._verbose: print("Writing online players.")
+            with open(self._online_players, "w") as file:
+                for item in timed.get_player_names():
+                    file.write(str(item) + "\n")
+
 
 
 class DataAnalyzer:
@@ -314,8 +356,6 @@ class DataAnalyzer:
                 file.write(str(datetime.datetime.now()))
 
 
-
-
 if __name__ == "__main__":
     # Example run
     print(f"Started - Saving to {str(pathlib.Path('save/'))} ")
@@ -328,6 +368,8 @@ if __name__ == "__main__":
         occmonitor.tick()
         match = occmonitor.get_pending()
         active = occmonitor.get_active()
+        timeds = occmonitor.get_timed()
         occwriter.write_data(match, active)
+        occwriter.write_timeds(timeds)
         occanalyzer.tick()
         sleep(1)
