@@ -276,6 +276,7 @@ class DataWriter:
                 for item in timed.get_player_names():
                     file.write(str(item) + "\n")
             with open(self._player_history, "a") as file:
+                file.write(datetime.datetime.now().isoformat() + "|")
                 for item in timed.get_player_names():
                     file.write(str(item) + "|")
                 file.write("\n")
