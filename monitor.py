@@ -201,6 +201,7 @@ class DataWriter:
         self._first_write = pathlib.Path(f"save/{server_name}/first_write")
         self._online_players = pathlib.Path(f"save/{server_name}/online")
         self._misc_data = pathlib.Path(f"save/{server_name}/misc")
+        self._player_history = pathlib.Path(f"save/{server_name}/player_history")
         self._verbose = verbose
 
         # Make sure files exists
@@ -210,6 +211,7 @@ class DataWriter:
         self._active_map.touch()
         self._misc_data.touch()
         self._online_players.touch()
+        self._player_history.touch()
 
         # Check if first_write exists, if yes then pass, if not then create it.
         if self._first_write.is_file():
@@ -273,7 +275,10 @@ class DataWriter:
             with open(self._online_players, "w") as file:
                 for item in timed.get_player_names():
                     file.write(str(item) + "\n")
-
+            with open(self._player_history, "a") as file:
+                for item in timed.get_player_names():
+                    file.write(str(item) + "|")
+                file.write("\n")
 
 
 class DataAnalyzer:
@@ -305,55 +310,53 @@ class DataAnalyzer:
         if self._cooldown > 0:
             self._cooldown -= 1
         else:
-            # Calculate average datas for each map (Average playtime, playercount, playercount change)
-            # Read each map line by line from map_history, construct a list of Match objects
-            # Then calculate the averages and write them to a file.
-            # If we run this script for 1 year then the map_history will only be around 1 MB,
-            # so we don't have to worry about loading too much stuff into memory.
-            self._cooldown = self._analyze_cooldown
-            print("Starting map average calculations.")
+            self.analyze_maps()
 
-            # Scan the file
-            with open(self._map_history, "r") as file:
-                for line in file:
-                    split = line.split(" | ")
-                    name = split[0]
-                    playtime = int(split[2])
-                    change = int(split[4])
-                    # check if a Map with a matching name exists in self._maps
-                    found = False
-                    for map_ in self._maps:
-                        if map_.map_name == name:
-                            map_.add_playtime(playtime)
-                            map_.add_player_change(change)
-                            found = True
+    def analyze_maps(self):
+        # Calculate average datas for each map (Average playtime, playercount, playercount change)
+        # Read each map line by line from map_history, construct a list of Match objects
+        # Then calculate the averages and write them to a file.
+        # If we run this script for 1 year then the map_history will only be around 1 MB,
+        # so we don't have to worry about loading too much stuff into memory.
+        self._cooldown = self._analyze_cooldown
+        print("Starting map average calculations.")
+        # Scan the file
+        with open(self._map_history, "r") as file:
+            for line in file:
+                split = line.split(" | ")
+                name = split[0]
+                playtime = int(split[2])
+                change = int(split[4])
+                # check if a Map with a matching name exists in self._maps
+                found = False
+                for map_ in self._maps:
+                    if map_.map_name == name:
+                        map_.add_playtime(playtime)
+                        map_.add_player_change(change)
+                        found = True
 
-                    if not found:
-                        map_to_add = Map(name)
-                        map_to_add.add_playtime(playtime)
-                        map_to_add.add_player_change(change)
-                        self._maps.append(map_to_add)
-
-            # Make the calculations
-            for map_ in self._maps:
-                map_.calculate_average_playtimes()
-                map_.calculate_average_player_changes()
-
-            # Get what to write
-            to_write = ""
-            for map_ in self._maps:
-                name = map_.map_name
-                playtime = map_.average_playtime
-                player_change = map_.average_player_change
-                to_write += f"{name} | {playtime} | {player_change}\n"
-
-            # Write to disk
-            with open(self._save_file, "w") as file:
-                file.write(to_write)
-
-            print("Calculations completed")
-            with open(self._last_cache_save, "w") as file:
-                file.write(str(datetime.datetime.now()))
+                if not found:
+                    map_to_add = Map(name)
+                    map_to_add.add_playtime(playtime)
+                    map_to_add.add_player_change(change)
+                    self._maps.append(map_to_add)
+        # Make the calculations
+        for map_ in self._maps:
+            map_.calculate_average_playtimes()
+            map_.calculate_average_player_changes()
+        # Get what to write
+        to_write = ""
+        for map_ in self._maps:
+            name = map_.map_name
+            playtime = map_.average_playtime
+            player_change = map_.average_player_change
+            to_write += f"{name} | {playtime} | {player_change}\n"
+        # Write to disk
+        with open(self._save_file, "w") as file:
+            file.write(to_write)
+        print("Calculations completed")
+        with open(self._last_cache_save, "w") as file:
+            file.write(str(datetime.datetime.now()))
 
 
 if __name__ == "__main__":
