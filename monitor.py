@@ -2,7 +2,7 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
-MONITOR_VERSION = "2.0.1"
+MONITOR_VERSION = "2.0.2"
 
 
 def get_monitor_version():
@@ -13,7 +13,8 @@ class TimedData:
     """
     Basic class for storing everything that needs to be saved periodically, rather than at the end of the game
     """
-    def __init__(self, online_players: list, is_complete: False):
+    def __init__(self, online_players: list, is_complete: False, playercount: int):
+        self.playercount = playercount
         self.online_players = online_players
         self._is_complete = is_complete  # Is the data complete (as a result of a query instead of a status check)
 
@@ -137,7 +138,7 @@ class ServerMonitor:
                 self._online_players = []
 
             # Create timed objects
-            self._timed_data = TimedData(self._online_players, is_complete=False)
+            self._timed_data = TimedData(self._online_players, is_complete=False, playercount=players)
             self._is_timed_data_pending = True
 
             # Check if the current map is different from the one we got last query
@@ -276,7 +277,7 @@ class DataWriter:
                 for item in timed.get_player_names():
                     file.write(str(item) + "\n")
             with open(self._player_history, "a") as file:
-                file.write(datetime.datetime.now().isoformat() + "|")
+                file.write(datetime.datetime.now().isoformat() + "|" + str(timed.playercount) + "|")
                 for item in timed.get_player_names():
                     file.write(str(item) + "|")
                 file.write("\n")
