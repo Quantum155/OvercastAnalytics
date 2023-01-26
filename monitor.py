@@ -2,7 +2,7 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
-MONITOR_VERSION = 2
+MONITOR_VERSION = "2.0.1"
 
 
 def get_monitor_version():

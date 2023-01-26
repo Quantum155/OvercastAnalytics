@@ -3,7 +3,7 @@ import pathlib
 from monitor import get_monitor_version
 from data_load import *
 
-API_VERSION = 3
+API_VERSION = "3.0.0"
 MONITOR_SERVERS = ["Overcast Community"]  # Folders inside /save/ from where the API can serve data.
 
 
