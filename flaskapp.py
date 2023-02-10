@@ -9,7 +9,7 @@ MONITOR_SERVERS = ["Overcast Community"]  # Folders inside /save/ from where the
 
 def has_access(server):
     if server in MONITOR_SERVERS: return True
-    else: return False
+    return False
 
 
 app = flask.Flask(__name__)
@@ -46,8 +46,7 @@ def server_data(server_name):
                               "last_cache_update": last_cache,
                               "maps_tracked": maps_tracked,
                               "player_sample": player_sample})
-    else:
-        return flask.jsonify("Requested server not found"), 404
+    return flask.jsonify("Requested server not found"), 404
 
 
 @app.route("/<string:server_name>/current_map/")
@@ -65,8 +64,7 @@ def current_map(server_name):
         game_time = load_game_time(directory)
         return flask.jsonify({"current_map": active_map,
                               "game_time": game_time})
-    else:
-        return flask.jsonify("Requested server not found"), 404
+    return flask.jsonify("Requested server not found"), 404
 
 
 @app.route("/<string:server_name>/maps/<string:map_name>/", methods=["GET"])
@@ -87,16 +85,13 @@ def map_data(server_name, map_name):
 
         if not is_found:
             return flask.jsonify("Requested map not found"), 404
-        else:
-            return flask.jsonify({"server_name": server_name,
-                                  "map_name": map_name,
-                                  "found_in_cache": cached_data_found,
-                                  "playcount": map_playcount,
-                                  "map_avg_playtime": map_avg_playtime,
-                                  "map_avg_playercount_change": map_avg_playercount_change})
-
-    else:
-        return flask.jsonify("Requested server not found"), 404
+        return flask.jsonify({"server_name": server_name,
+                              "map_name": map_name,
+                              "found_in_cache": cached_data_found,
+                              "playcount": map_playcount,
+                              "map_avg_playtime": map_avg_playtime,
+                              "map_avg_playercount_change": map_avg_playercount_change})
+    return flask.jsonify("Requested server not found"), 404
 
 
 if __name__ == '__main__':

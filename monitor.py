@@ -174,8 +174,7 @@ class ServerMonitor:
         if self._is_pending:
             self._is_pending = False
             return self._pending_map
-        else:
-            return None
+        return None
 
     def get_active(self):
         return self._prev_map
@@ -184,8 +183,7 @@ class ServerMonitor:
         if self._is_timed_data_pending:
             self._is_timed_data_pending = False
             return self._timed_data
-        else:
-            return None
+        return None
 
 
 class DataWriter:
