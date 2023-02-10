@@ -158,7 +158,7 @@ class ServerMonitor:
                     print(f"Playtime: {self._current_playtime * self._query_time} seconds.")
                     print(f"Players at end: {players} \
                             [{players - self._starting_players:+g}]")
-                    print(f"---------------------------------\n")
+                    print("---------------------------------\n")
 
 
                 # Reset the match-tracking variables
@@ -231,7 +231,7 @@ class DataWriter:
             pass
         else:
             # Writing map history
-            if self._verbose: print(f"Starting the save - Map History")
+            if self._verbose: print("Starting the save - Map History")
             with open(self._history_file, "a") as file:
                 name = match.name
                 stime = str(match.start_date)
@@ -241,7 +241,7 @@ class DataWriter:
                 file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
             # Writing map data
-            if self._verbose: print(f"Staring the save - Map Data")
+            if self._verbose: print("Staring the save - Map Data")
             with open(self._map_data, "r") as file:
                 data = file.read()
 
@@ -262,7 +262,7 @@ class DataWriter:
             with open(self._map_data, "w") as file:
                 file.write(new_data)
 
-            if self._verbose: print(f"Starting the save - Active map")
+            if self._verbose: print("Starting the save - Active map")
 
             with open(self._active_map, "w") as file:
                 file.write(active_map)
