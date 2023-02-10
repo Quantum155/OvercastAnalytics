@@ -35,7 +35,7 @@ Response {
 ---
 Response {
     "current_map": str,
-    [FUTURE] "playtime": int
+    "playtime": int
 }
 ```
 

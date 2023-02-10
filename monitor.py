@@ -2,7 +2,7 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
-MONITOR_VERSION = "2.0.2"
+MONITOR_VERSION = "2.0.3"
 
 
 def get_monitor_version():
@@ -13,10 +13,11 @@ class TimedData:
     """
     Basic class for storing everything that needs to be saved periodically, rather than at the end of the game
     """
-    def __init__(self, online_players: list, is_complete: False, playercount: int):
+    def __init__(self, online_players: list, is_complete: False, playercount: int, game_time: int):
         self.playercount = playercount
         self.online_players = online_players
         self._is_complete = is_complete  # Is the data complete (as a result of a query instead of a status check)
+        self.game_time = game_time
 
     def get_player_names(self):
         player_names = []
@@ -41,7 +42,6 @@ class Match:
 
     def get_player_change(self):
         return self.end_players - self.start_players
-
 
 
 class Map:
@@ -138,7 +138,8 @@ class ServerMonitor:
                 self._online_players = []
 
             # Create timed objects
-            self._timed_data = TimedData(self._online_players, is_complete=False, playercount=players)
+            self._timed_data = TimedData(self._online_players, is_complete=False, playercount=players,
+                                         game_time=self._current_playtime * self._query_time)
             self._is_timed_data_pending = True
 
             # Check if the current map is different from the one we got last query
@@ -199,6 +200,7 @@ class DataWriter:
         self._history_file = pathlib.Path(f"save/{server_name}/map_history")
         self._map_data = pathlib.Path(f"save/{server_name}/map_data")
         self._active_map = pathlib.Path(f"save/{server_name}/active_map")
+        self._game_time = pathlib.Path(f"save/{server_name}/game_time")
         self._first_write = pathlib.Path(f"save/{server_name}/first_write")
         self._online_players = pathlib.Path(f"save/{server_name}/online")
         self._misc_data = pathlib.Path(f"save/{server_name}/misc")
@@ -210,6 +212,7 @@ class DataWriter:
         self._history_file.touch()
         self._map_data.touch()
         self._active_map.touch()
+        self._game_time.touch()
         self._misc_data.touch()
         self._online_players.touch()
         self._player_history.touch()
@@ -281,6 +284,8 @@ class DataWriter:
                 for item in timed.get_player_names():
                     file.write(str(item) + "|")
                 file.write("\n")
+            with open(self._game_time, "w") as file:
+                file.write(str(timed.game_time).strip() + "\n")
 
 
 class DataAnalyzer:
@@ -365,7 +370,7 @@ if __name__ == "__main__":
     # Example run
     print(f"Started - Saving to {str(pathlib.Path('save/'))} ")
 
-    occmonitor = ServerMonitor("play.oc.tc", verbose=True)
+    occmonitor = ServerMonitor("play.oc.tc", verbose=True, query_time=10)
     occwriter = DataWriter("Overcast Community", verbose=True)
     occanalyzer = DataAnalyzer("Overcast Community")
 

@@ -59,6 +59,11 @@ def load_active_map(directory):
         return file.read()
 
 
+def load_game_time(directory):
+    with open((directory / "game_time"), "r") as file:
+        return int(file.read().strip())
+
+
 def load_players(directory):
     with open((directory / "online"), "r") as file:
         players = []
