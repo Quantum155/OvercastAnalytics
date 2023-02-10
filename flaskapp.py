@@ -91,9 +91,7 @@ def map_data(server_name, map_name):
                               "playcount": map_playcount,
                               "map_avg_playtime": map_avg_playtime,
                               "map_avg_playercount_change": map_avg_playercount_change})
-
-    else:
-        return flask.jsonify("Requested server not found"), 404
+    return flask.jsonify("Requested server not found"), 404
 
 
 if __name__ == '__main__':
