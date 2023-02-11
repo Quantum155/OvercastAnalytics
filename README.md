@@ -1,4 +1,6 @@
 # OvercastAnalytics
+[![DeepSource](https://deepsource.io/gh/Quantum155/OvercastAnalytics.svg/?label=active+issues&show_trend=true&token=zfwolrih2FPA5BGLTWI4W-Fo)](https://deepsource.io/gh/Quantum155/OvercastAnalytics/?ref=repository-badge)
+
 Tool to track played maps and player counts on play.oc.tc.
 
 monitor.py: Gets the data from the server by querying it and extracting the motd, then saving it to a file
