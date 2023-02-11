@@ -229,35 +229,35 @@ class DataWriter:
             with open(self._first_write, "w") as file:
                 file.write(str(datetime.datetime.now()))
 
-    def write_data(self, match: Match, active_map: str):
+    def write_data(self, _match: Match, active_map: str):
         """
-        :param match: The Match object to write
+        :param _match: The Match object to write
         :param active_map: The name of the active map
         """
-        if match is None:
+        if _match is None:
             pass
         else:
-            if match.is_event:
+            if _match.is_event:
                 with open(self._active_map, "w") as file:
                     file.write("SYS_EVENT")
 
                 with open(self._history_file, "a") as file:
                     name = "SYS_EVENT"
-                    stime = str(match.start_date)
-                    ptime = match.playtime
-                    splayers = match.start_players
-                    pchange = match.get_player_change()
+                    stime = str(_match.start_date)
+                    ptime = _match.playtime
+                    splayers = _match.start_players
+                    pchange = _match.get_player_change()
                     file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
             else:
                 # Writing map history
                 if self._verbose:
                     print("Starting the save - Map History")
                 with open(self._history_file, "a") as file:
-                    name = match.name
-                    stime = str(match.start_date)
-                    ptime = match.playtime
-                    splayers = match.start_players
-                    pchange = match.get_player_change()
+                    name = _match.name
+                    stime = str(_match.start_date)
+                    ptime = _match.playtime
+                    splayers = _match.start_players
+                    pchange = _match.get_player_change()
                     file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
                 if self._verbose:
@@ -277,13 +277,13 @@ class DataWriter:
                     split = line.split(" | ")
                     mapname = split[0]
                     playcount = int(split[1])
-                    if mapname == match.name:
+                    if mapname == _match.name:
                         is_written = True
                         new_data += f"{mapname} | {playcount+1}\n"
                     else:
                         new_data += f"{mapname} | {playcount}\n"
                 if not is_written:
-                    new_data += f"{match.name} | 1\n"
+                    new_data += f"{_match.name} | 1\n"
 
                 with open(self._map_data, "w") as file:
                     file.write(new_data)
