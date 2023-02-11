@@ -149,7 +149,8 @@ class ServerMonitor:
             if self._prev_map != active_map_name:
                 if "§" in active_map_name:
                     self._is_event = True
-                if self._verbose: print(f"New map detected. {self._prev_map} >> {active_map_name}")
+                if self._verbose:
+                    print(f"New map detected. {self._prev_map} >> {active_map_name}")
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(self._start_time, self._current_playtime*self._query_time,
@@ -172,7 +173,8 @@ class ServerMonitor:
                 self._current_playtime = 0
             else:
                 # Add one to the current playtime. Time will be obtained by multiplying this with the query time
-                if self._verbose: print("No map change detected.")
+                if self._verbose:
+                    print("No map change detected.")
                 self._current_playtime += 1
 
     def get_pending(self):
@@ -248,7 +250,8 @@ class DataWriter:
                     file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
             else:
                 # Writing map history
-                if self._verbose: print("Starting the save - Map History")
+                if self._verbose:
+                    print("Starting the save - Map History")
                 with open(self._history_file, "a") as file:
                     name = match.name
                     stime = str(match.start_date)
@@ -257,12 +260,14 @@ class DataWriter:
                     pchange = match.get_player_change()
                     file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
-                if self._verbose: print("Starting the save - Active map")
+                if self._verbose:
+                    print("Starting the save - Active map")
                 with open(self._active_map, "w") as file:
                     file.write(active_map)
 
                 # Writing map data
-                if self._verbose: print("Staring the save - Map Data")
+                if self._verbose:
+                    print("Staring the save - Map Data")
                 with open(self._map_data, "r") as file:
                     data = file.read()
 
@@ -283,13 +288,15 @@ class DataWriter:
                 with open(self._map_data, "w") as file:
                     file.write(new_data)
 
-                if self._verbose: print("Write finished.")
+                if self._verbose:
+                    print("Write finished.")
 
     def write_timeds(self, timed: TimedData):
         if timed is None:
             pass
         else:
-            if self._verbose: print("Writing online players.")
+            if self._verbose:
+                print("Writing online players.")
             with open(self._online_players, "w") as file:
                 for item in timed.get_player_names():
                     file.write(str(item) + "\n")
