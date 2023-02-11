@@ -9,7 +9,7 @@ import discord
 import dotenv
 import pathlib
 
-VERSION = "dev0"
+VERSION = "1.0.0"
 
 # Env setup
 dotenv.load_dotenv()
