@@ -48,7 +48,8 @@ def load_server_data(directory):
     invalid = 0
     with open((directory / "map_data"), 'r') as fp:
         for count, line in enumerate(fp):
-            if line.startswith("SYS_"): invalid += 1
+            if line.startswith("SYS_"):
+                invalid += 1
     maps_tracked = count + 1 - invalid
 
     return monitoring_since, last_cache, maps_tracked

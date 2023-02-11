@@ -8,7 +8,8 @@ MONITOR_SERVERS = ["Overcast Community"]  # Folders inside /save/ from where the
 
 
 def has_access(server):
-    if server in MONITOR_SERVERS: return True
+    if server in MONITOR_SERVERS:
+        return True
     return False
 
 
@@ -33,7 +34,8 @@ def server_data(server_name):
     :param server_name: Name of the server
     """
     # Make sure accessing that data is allowed
-    if not has_access(server_name): return flask.jsonify("Requested server not found or forbidden"), 403
+    if not has_access(server_name):
+        return flask.jsonify("Requested server not found or forbidden"), 403
 
     directory = pathlib.Path(f"save/{server_name}")
 
@@ -55,7 +57,8 @@ def current_map(server_name):
     Returns the currently playing map
     :param server_name: Name of the server
     """
-    if not has_access(server_name): return flask.jsonify("Requested server not found or forbidden"), 403
+    if not has_access(server_name):
+        return flask.jsonify("Requested server not found or forbidden"), 403
 
     directory = pathlib.Path(f"save/{server_name}")
 
@@ -79,7 +82,8 @@ def map_data(server_name, map_name):
     :param server_name: Name of the server
     :param map_name: Name of the map
     """
-    if not has_access(server_name): return flask.jsonify("Requested server not found or forbidden"), 403
+    if not has_access(server_name):
+        return flask.jsonify("Requested server not found or forbidden"), 403
 
     directory = pathlib.Path(f"save/{server_name}")
 
