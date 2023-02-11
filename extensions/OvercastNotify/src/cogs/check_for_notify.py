@@ -28,7 +28,7 @@ class CheckForNotify(commands.Cog):
     @discord.slash_command()
     async def reload(self, interaction: discord.Interaction):
         self.load_config()
-        await interaction.response.send_message(f"Reloaded config")
+        await interaction.response.send_message("Reloaded config")
 
     @tasks.loop(seconds=20)
     async def check_for_notify(self):
@@ -39,25 +39,26 @@ class CheckForNotify(commands.Cog):
         game_time = api_response.json()["game_time"]
         if not is_event:
             for key, value in self.configs.items():
-                if not self.is_notified[key]:
-                    if game_time >= self.configs[key]["after"]:
-                        self.is_notified[key] = True
-                        self.tracking_changes[key] = current_map
-                        await self.bot.get_guild(int(key)).get_channel(
-                            int(self.configs[key]["channel"])
-                        ).send(
-                            f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
-                            f" {self.configs[key]['message']}"
-                            f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)"
-                        )
-        for key, value in self.is_notified.items():
-            if value:
-                if self.tracking_changes[key] != current_map:
+                if (
+                    not self.is_notified[key]
+                    and game_time >= self.configs[key]["after"]
+                ):
+                    self.is_notified[key] = True
+                    self.tracking_changes[key] = current_map
                     await self.bot.get_guild(int(key)).get_channel(
                         int(self.configs[key]["channel"])
-                    ).send(f"Game ended. The new map is: **{current_map}**.\n")
-                    self.is_notified[key] = False
-                    self.tracking_changes[key] = False
+                    ).send(
+                        f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
+                        f" {self.configs[key]['message']}"
+                        f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)"
+                    )
+        for key, value in self.is_notified.items():
+            if value and self.tracking_changes[key] != current_map:
+                await self.bot.get_guild(int(key)).get_channel(
+                    int(self.configs[key]["channel"])
+                ).send(f"Game ended. The new map is: **{current_map}**.\n")
+                self.is_notified[key] = False
+                self.tracking_changes[key] = False
 
     @check_for_notify.before_loop
     async def before_loop_start(self):
