@@ -71,13 +71,15 @@ def current_map(server_name):
 
     if directory.is_dir():
         active_map = load_active_map(directory)
-        game_time = load_game_time(directory)
-        # Check if it's an event
         event = False
         if active_map == "SYS_EVENT":
-            # Load backup save and get the map name
             event = True
+        if server_name == "Overcast Community":
+            #  Always use the more reliable cloudy source (that comes from Cloudy)
+            #  This is a terrible implementation, but it works.
+            #  (Also, it's hard to avoid it without a major refactor)
             active_map = load_occ_backup_data()
+        game_time = load_game_time(directory)
         return flask.jsonify({
             "current_map": active_map,
             "game_time": game_time,
