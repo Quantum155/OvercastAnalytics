@@ -3,3 +3,4 @@ flask~=2.1.2
 gunicorn
 py-cord
 python-dotenv~=0.21.1
+requests

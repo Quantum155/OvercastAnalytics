@@ -10,3 +10,6 @@ flaskapp.py: Defines the routes used in the API with Flask
 data_load.py: Defines functions used in flaskapp.py to load the data from the files
 
 overcast-map-link.py: A pycord discord bot to read map data from Cloudy even if the query method fails
+
+Extensions: Scripts under extensions/ do not contribute anything to the core functionaility of the project - rather,
+they build on it. Since they depend on my API, it makes sense to manage them here instead of in an external repo.
