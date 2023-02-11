@@ -39,10 +39,8 @@ class CheckForNotify(commands.Cog):
         game_time = api_response.json()["game_time"]
         if not is_event:
             for key, value in self.configs.items():
-                if (
-                    not self.is_notified[key]
-                    and game_time >= self.configs[key]["after"]
-                ):
+                if (not self.is_notified[key]
+                        and game_time >= self.configs[key]["after"]):
                     self.is_notified[key] = True
                     self.tracking_changes[key] = current_map
                     await self.bot.get_guild(int(key)).get_channel(
