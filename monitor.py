@@ -2,7 +2,7 @@ import mcstatus
 from time import sleep
 import datetime
 import pathlib
-MONITOR_VERSION = "2.0.3"
+MONITOR_VERSION = "2.0.4"
 
 
 def get_monitor_version():
@@ -30,12 +30,13 @@ class Match:
     """
     Basic class for storing all data related to a recently played map.
     """
-    def __init__(self, start_date: datetime.datetime, playtime, name, start_players, end_players):
+    def __init__(self, start_date: datetime.datetime, playtime, name, start_players, end_players, is_event: bool):
         self.start_date = start_date
         self.playtime = playtime
         self.name = name
         self.start_players = start_players
         self.end_players = end_players
+        self.is_event = is_event
 
     def get_end_date(self):
         return self.start_date + datetime.timedelta(seconds=self.playtime)
@@ -113,6 +114,8 @@ class ServerMonitor:
         self._timed_data = None
         self._is_timed_data_pending = False
 
+        self._is_event = False
+
     def tick(self):
         # Check if the query cooldown expired, if yes reset it and query the server
         if self._query_cooldown > 0:
@@ -144,12 +147,14 @@ class ServerMonitor:
 
             # Check if the current map is different from the one we got last query
             if self._prev_map != active_map_name:
+                if "§" in active_map_name:
+                    self._is_event = True
                 if self._verbose: print(f"New map detected. {self._prev_map} >> {active_map_name}")
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(self._start_time, self._current_playtime*self._query_time,
                                           self._prev_map, self._starting_players,
-                                          players)
+                                          players, self._is_event)
                 self._is_pending = True
 
                 if self._verbose:
@@ -158,8 +163,8 @@ class ServerMonitor:
                     print(f"Playtime: {self._current_playtime * self._query_time} seconds.")
                     print(f"Players at end: {players} \
                             [{players - self._starting_players:+g}]")
+                    print(f"Is event: {self._is_event}")
                     print("---------------------------------\n")
-
 
                 # Reset the match-tracking variables
                 self._prev_map = active_map_name
@@ -230,44 +235,55 @@ class DataWriter:
         if match is None:
             pass
         else:
-            # Writing map history
-            if self._verbose: print("Starting the save - Map History")
-            with open(self._history_file, "a") as file:
-                name = match.name
-                stime = str(match.start_date)
-                ptime = match.playtime
-                splayers = match.start_players
-                pchange = match.get_player_change()
-                file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
+            if match.is_event:
+                with open(self._active_map, "w") as file:
+                    file.write("SYS_EVENT")
 
-            # Writing map data
-            if self._verbose: print("Staring the save - Map Data")
-            with open(self._map_data, "r") as file:
-                data = file.read()
+                with open(self._history_file, "a") as file:
+                    name = "SYS_EVENT"
+                    stime = str(match.start_date)
+                    ptime = match.playtime
+                    splayers = match.start_players
+                    pchange = match.get_player_change()
+                    file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
+            else:
+                # Writing map history
+                if self._verbose: print("Starting the save - Map History")
+                with open(self._history_file, "a") as file:
+                    name = match.name
+                    stime = str(match.start_date)
+                    ptime = match.playtime
+                    splayers = match.start_players
+                    pchange = match.get_player_change()
+                    file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
-            new_data = ""
-            is_written = False
-            for line in data.splitlines():
-                split = line.split(" | ")
-                mapname = split[0]
-                playcount = int(split[1])
-                if mapname == match.name:
-                    is_written = True
-                    new_data += f"{mapname} | {playcount+1}\n"
-                else:
-                    new_data += f"{mapname} | {playcount}\n"
-            if not is_written:
-                new_data += f"{match.name} | 1\n"
+                if self._verbose: print("Starting the save - Active map")
+                with open(self._active_map, "w") as file:
+                    file.write(active_map)
 
-            with open(self._map_data, "w") as file:
-                file.write(new_data)
+                # Writing map data
+                if self._verbose: print("Staring the save - Map Data")
+                with open(self._map_data, "r") as file:
+                    data = file.read()
 
-            if self._verbose: print("Starting the save - Active map")
+                new_data = ""
+                is_written = False
+                for line in data.splitlines():
+                    split = line.split(" | ")
+                    mapname = split[0]
+                    playcount = int(split[1])
+                    if mapname == match.name:
+                        is_written = True
+                        new_data += f"{mapname} | {playcount+1}\n"
+                    else:
+                        new_data += f"{mapname} | {playcount}\n"
+                if not is_written:
+                    new_data += f"{match.name} | 1\n"
 
-            with open(self._active_map, "w") as file:
-                file.write(active_map)
+                with open(self._map_data, "w") as file:
+                    file.write(new_data)
 
-            if self._verbose: print("Write finished.")
+                if self._verbose: print("Write finished.")
 
     def write_timeds(self, timed: TimedData):
         if timed is None:

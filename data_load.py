@@ -70,4 +70,3 @@ def load_players(directory):
         for line in file.readlines():
             players.append(line.strip())
         return players
-

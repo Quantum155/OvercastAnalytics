@@ -35,7 +35,8 @@ Response {
 ---
 Response {
     "current_map": str,
-    "playtime": int
+    "playtime": int,
+    "event": bool
 }
 ```
 

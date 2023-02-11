@@ -3,7 +3,7 @@ import pathlib
 from monitor import get_monitor_version
 from data_load import *
 
-API_VERSION = "3.0.1"
+API_VERSION = "3.0.2"
 MONITOR_SERVERS = ["Overcast Community"]  # Folders inside /save/ from where the API can serve data.
 
 
@@ -62,8 +62,13 @@ def current_map(server_name):
     if directory.is_dir():
         active_map = load_active_map(directory)
         game_time = load_game_time(directory)
+        # Check if it's an event
+        event = False
+        if active_map == "SYS_EVENT":
+            event = True
         return flask.jsonify({"current_map": active_map,
-                              "game_time": game_time})
+                              "game_time": game_time,
+                              "event": event})
     return flask.jsonify("Requested server not found"), 404
 
 
