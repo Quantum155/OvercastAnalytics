@@ -46,6 +46,7 @@ def load_server_data(directory):
         last_cache = file.read()
     # Count number of maps in file
     invalid = 0
+    count = None
     with open((directory / "map_data"), 'r') as fp:
         for count, line in enumerate(fp):
             if line.startswith("SYS_"):
