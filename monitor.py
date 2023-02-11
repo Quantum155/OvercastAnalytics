@@ -52,7 +52,7 @@ class Match:
 
 class Map:
     """
-    Class to store data related to a map (Average times etc)
+    Class to store data related to a map (Average times etc.)
     Also has functions to calculate the data.
     """
 

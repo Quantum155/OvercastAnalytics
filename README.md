@@ -8,3 +8,5 @@ monitor.py: Gets the data from the server by querying it and extracting the motd
 flaskapp.py: Defines the routes used in the API with Flask
 
 data_load.py: Defines functions used in flaskapp.py to load the data from the files
+
+overcast-map-link.py: A pycord discord bot to read map data from Cloudy even if the query method fails

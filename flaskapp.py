@@ -3,7 +3,7 @@ import pathlib
 from monitor import get_monitor_version
 from data_load import *
 
-API_VERSION = "3.0.2"
+API_VERSION = "3.0.3"
 MONITOR_SERVERS = [
     "Overcast Community"
 ]  # Folders inside /save/ from where the API can serve data.
@@ -75,7 +75,9 @@ def current_map(server_name):
         # Check if it's an event
         event = False
         if active_map == "SYS_EVENT":
+            # Load backup save and get the map name
             event = True
+            active_map = load_occ_backup_data()
         return flask.jsonify({
             "current_map": active_map,
             "game_time": game_time,

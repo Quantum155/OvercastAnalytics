@@ -71,3 +71,7 @@ def load_players(directory):
         for line in file.readlines():
             players.append(line.strip())
         return players
+
+def load_occ_backup_data():
+    with open("save/Overcast Community/backup_current_map.txt") as file:
+        return file.read().strip()
