@@ -16,6 +16,8 @@ bot = discord.Bot(intents=intents)
 # Load extensions
 bot.load_extension("src.cogs.status")
 bot.load_extension("src.cogs.current_map")
+bot.load_extension("src.cogs.check_for_notify")
+bot.load_extension("src.cogs.set_notifications")
 
 # Events
 @bot.event
