@@ -134,7 +134,7 @@ class ServerMonitor:
                 players = status.players.online
                 self._online_players = status.players.sample
                 active_map_name = motd.splitlines()[1][6:-4]  # Get the map name out from OCC's MOTD
-            except Exception as ex:  # Not sure of every exception that can be raised
+            except Exception as ex:  # skipcq: PYL-W0703 - We want to catch every exception
                 print(f"[ERROR] Unable to query server: {ex}")
                 active_map_name = "SYS_QUERYERROR"
                 players = 0
