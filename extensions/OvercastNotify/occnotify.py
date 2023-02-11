@@ -8,7 +8,6 @@ VERSION = "dev0"
 dotenv.load_dotenv()
 TOKEN = str(os.getenv("TOKEN"))
 
-
 # Bot setup
 intents = discord.Intents.default()
 bot = discord.Bot(intents=intents)
@@ -19,9 +18,11 @@ bot.load_extension("src.cogs.current_map")
 bot.load_extension("src.cogs.check_for_notify")
 bot.load_extension("src.cogs.set_notifications")
 
+
 # Events
 @bot.event
 async def on_ready():
     print("Ready!")
+
 
 bot.run(TOKEN)

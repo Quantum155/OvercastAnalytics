@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import requests
 import pathlib
 import json
-from src.cogs.current_map import format_seconds # noqa
+from src.cogs.current_map import format_seconds  # noqa
 
 
 class CheckForNotify(commands.Cog):
@@ -32,7 +32,8 @@ class CheckForNotify(commands.Cog):
 
     @tasks.loop(seconds=20)
     async def check_for_notify(self):
-        api_response = requests.get("https://quanteey.xyz/Overcast%20Community/current_map/")
+        api_response = requests.get(
+            "https://quanteey.xyz/Overcast%20Community/current_map/")
         current_map = api_response.json()["current_map"]
         is_event = api_response.json()["event"]
         game_time = api_response.json()["game_time"]
@@ -42,16 +43,19 @@ class CheckForNotify(commands.Cog):
                     if game_time >= self.configs[key]["after"]:
                         self.is_notified[key] = True
                         self.tracking_changes[key] = current_map
-                        await self.bot.get_guild(int(key)).get_channel(int(self.configs[key]["channel"])).send(
+                        await self.bot.get_guild(int(key)).get_channel(
+                            int(self.configs[key]["channel"])
+                        ).send(
                             f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
                             f" {self.configs[key]['message']}"
-                            f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)")
+                            f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)"
+                        )
         for key, value in self.is_notified.items():
             if value:
                 if self.tracking_changes[key] != current_map:
-                    await self.bot.get_guild(int(key)).get_channel(int(self.configs[key]["channel"])).send(
-                        f"Game ended. The new map is: **{current_map}**.\n"
-                    )
+                    await self.bot.get_guild(int(key)).get_channel(
+                        int(self.configs[key]["channel"])
+                    ).send(f"Game ended. The new map is: **{current_map}**.\n")
                     self.is_notified[key] = False
                     self.tracking_changes[key] = False
 
