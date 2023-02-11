@@ -42,9 +42,6 @@ async def on_ready():
 
 @bot.event
 async def on_message(message: discord.Message):
-    print(
-        f"[{message.channel.name}] <{message.author.display_name}>: {message.content}"
-    )
     if message.channel.name == "cloudy3-match-status":
         content = message.content.split("`")
         map_ = content[1].strip()
