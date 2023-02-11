@@ -28,23 +28,29 @@ bot = discord.Bot(intents=intents)
 # Load extensions
 bot.load_extension("dcmaplink.src.cogs.status")
 
+
 # Events
 @bot.event
 async def on_ready():
     print("Ready!")
-    await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send("[STARTUP] OCCNotify in UP")
+    await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send(
+        "[STARTUP] OCCNotify in UP")
     # Make sure backup savefiles exist
     pathlib.Path(f"save/Overcast Community").mkdir(parents=True, exist_ok=True)
     backup_save.touch()
 
+
 @bot.event
 async def on_message(message: discord.Message):
-    print(f"[{message.channel.name}] <{message.author.display_name}>: {message.content}")
+    print(
+        f"[{message.channel.name}] <{message.author.display_name}>: {message.content}"
+    )
     if message.channel.name == "cloudy3-match-status":
         content = message.content.split("`")
         map_ = content[1].strip()
         # Write map to the backup save file
         with open(backup_save, "w") as file:
             file.write(map_)
+
 
 bot.run(TOKEN)
