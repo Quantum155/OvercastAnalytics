@@ -30,7 +30,7 @@ class CheckForNotify(commands.Cog):
         self.load_config()
         await interaction.response.send_message(f"Reloaded config")
 
-    @tasks.loop(seconds=1)
+    @tasks.loop(seconds=20)
     async def check_for_notify(self):
         api_response = requests.get("https://quanteey.xyz/Overcast%20Community/current_map/")
         current_map = api_response.json()["current_map"]
@@ -46,6 +46,14 @@ class CheckForNotify(commands.Cog):
                             f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
                             f" {self.configs[key]['message']}"
                             f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)")
+        for key, value in self.is_notified.items():
+            if value:
+                if self.tracking_changes[key] != current_map:
+                    await self.bot.get_guild(int(key)).get_channel(int(self.configs[key]["channel"])).send(
+                        f"Game ended. The new map is: **{current_map}**.\n"
+                    )
+                    self.is_notified[key] = False
+                    self.tracking_changes[key] = False
 
     @check_for_notify.before_loop
     async def before_loop_start(self):
