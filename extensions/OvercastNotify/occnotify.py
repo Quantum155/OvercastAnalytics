@@ -17,6 +17,7 @@ bot.load_extension("src.cogs.status")
 bot.load_extension("src.cogs.current_map")
 bot.load_extension("src.cogs.check_for_notify")
 bot.load_extension("src.cogs.set_notifications")
+bot.load_extension("src.cogs.get_map_data")
 
 
 # Events
