@@ -36,7 +36,7 @@ async def on_ready():
     await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send(
         "[STARTUP] OCCNotify in UP")
     # Make sure backup savefiles exist
-    pathlib.Path(f"save/Overcast Community").mkdir(parents=True, exist_ok=True)
+    pathlib.Path("save/Overcast Community").mkdir(parents=True, exist_ok=True)
     backup_save.touch()
 
 
