@@ -34,29 +34,32 @@ class CheckForNotify(commands.Cog):
     async def check_for_notify(self):
         api_response = requests.get(
             "https://quanteey.xyz/Overcast%20Community/current_map/")
-        current_map = api_response.json()["current_map"]
-        is_event = api_response.json()["event"]
-        game_time = api_response.json()["game_time"]
-        if not is_event:
-            for key, value in self.configs.items():
-                if (not self.is_notified[key]
-                        and game_time >= self.configs[key]["after"]):
-                    self.is_notified[key] = True
-                    self.tracking_changes[key] = current_map
+        if api_response.status_code == 200:
+            current_map = api_response.json()["current_map"]
+            is_event = api_response.json()["event"]
+            game_time = api_response.json()["game_time"]
+            if not is_event:
+                for key, value in self.configs.items():
+                    if (not self.is_notified[key]
+                            and game_time >= self.configs[key]["after"]):
+                        self.is_notified[key] = True
+                        self.tracking_changes[key] = current_map
+                        await self.bot.get_guild(int(key)).get_channel(
+                            int(self.configs[key]["channel"])
+                        ).send(
+                            f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
+                            f" {self.configs[key]['message']}"
+                            f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)"
+                        )
+            for key, value in self.is_notified.items():
+                if value and self.tracking_changes[key] != current_map:
                     await self.bot.get_guild(int(key)).get_channel(
                         int(self.configs[key]["channel"])
-                    ).send(
-                        f"{self.bot.get_guild(int(key)).get_role(int(self.configs[key]['group'])).mention}"
-                        f" {self.configs[key]['message']}"
-                        f"\n(Game time: **{format_seconds(game_time)}**, Map: **{current_map}**)"
-                    )
-        for key, value in self.is_notified.items():
-            if value and self.tracking_changes[key] != current_map:
-                await self.bot.get_guild(int(key)).get_channel(
-                    int(self.configs[key]["channel"])
-                ).send(f"Game ended. The new map is: **{current_map}**.\n")
-                self.is_notified[key] = False
-                self.tracking_changes[key] = False
+                    ).send(f"Game ended. The new map is: **{current_map}**.\n")
+                    self.is_notified[key] = False
+                    self.tracking_changes[key] = False
+        else:
+            print(f"Unable to get current map - {api_response.status_code}")
 
     @check_for_notify.before_loop
     async def before_loop_start(self):

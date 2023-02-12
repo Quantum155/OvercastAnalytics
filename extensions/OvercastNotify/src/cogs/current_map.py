@@ -45,14 +45,14 @@ class CurrentMap(commands.Cog):
     async def current_map(self, interaction: discord.Interaction):
         api_response = requests.get(
             "https://quanteey.xyz/Overcast%20Community/current_map/")
-        current_map = api_response.json()["current_map"]
-        is_event = api_response.json()["event"]
-        if is_event:
-            is_event = "Yes"
-        else:
-            is_event = "No"
-        game_time = api_response.json()["game_time"]
         if api_response.status_code == 200:
+            current_map = api_response.json()["current_map"]
+            is_event = api_response.json()["event"]
+            if is_event:
+                is_event = "Yes"
+            else:
+                is_event = "No"
+            game_time = api_response.json()["game_time"]
             await interaction.response.send_message(
                 f"Current map: **{current_map}**\n"
                 f"Event: **{is_event}**\n"

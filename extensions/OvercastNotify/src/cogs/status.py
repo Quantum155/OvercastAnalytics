@@ -11,9 +11,9 @@ class Status(commands.Cog):
     @discord.slash_command()
     async def online(self, interaction: discord.Interaction):
         api_response = requests.get("https://quanteey.xyz/")
-        version = api_response.json()["api_version"]
-        monitor_version = api_response.json()["monitor_version"]
         if api_response.status_code == 200:
+            version = api_response.json()["api_version"]
+            monitor_version = api_response.json()["monitor_version"]
             await interaction.response.send_message(
                 f"Quanteey API is online"
                 f" (**{int(api_response.elapsed.total_seconds()*1000)}ms**)\n"

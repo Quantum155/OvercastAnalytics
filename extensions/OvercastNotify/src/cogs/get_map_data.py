@@ -14,18 +14,22 @@ class MapData(commands.Cog):
                            map_name: str):
         api_response = requests.get(
             f"https://quanteey.xyz/Overcast%20Community/maps/{map_name}")
-        found_in_cache = api_response.json()["found_in_cache"]
-        playcount = api_response.json()["playcount"]
-        map_avg_playtime = api_response.json()["map_avg_playtime"]
-        map_avg_playercount_change = api_response.json(
-        )["map_avg_playercount_change"]
         if api_response.status_code == 200:
+            found_in_cache = api_response.json()["found_in_cache"]
+            playcount = api_response.json()["playcount"]
+            map_avg_playtime = int(api_response.json()["map_avg_playtime"])
+            map_avg_playercount_change = api_response.json(
+            )["map_avg_playercount_change"]
             await interaction.response.send_message(
                 f"Data for map: **{map_name}**\n"
                 f"Is cached: **{found_in_cache}**\n"
                 f"Times played: **{playcount}**\n"
                 f"Average playtime: **{format_seconds(map_avg_playtime)}**\n"
-                f"Average playercount change: **{map_avg_playercount_change}**"
+                f"Average playercount change: **{map_avg_playercount_change:.2f}**"
+            )
+        elif api_response.status_code == 404:
+            await interaction.response.send_message(
+                f"Requested map is not found: **{map_name}**"
             )
         else:
             await interaction.response.send_message(
