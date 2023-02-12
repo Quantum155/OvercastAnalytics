@@ -29,8 +29,7 @@ class MapData(commands.Cog):
             )
         elif api_response.status_code == 404:
             await interaction.response.send_message(
-                f"Requested map is not found: **{map_name}**"
-            )
+                f"Requested map is not found: **{map_name}**")
         else:
             await interaction.response.send_message(
                 f"Quanteey API is not online / failed:"
