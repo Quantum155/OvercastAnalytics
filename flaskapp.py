@@ -102,8 +102,7 @@ def map_data(server_name, map_name):
 
     if directory.is_dir():
         # Load data for map
-        is_found, cached_data_found, map_playcount, \
-        map_avg_playtime, map_avg_playercount_change = load_map_data(directory, map_name)
+        is_found, cached_data_found, map_playcount, map_avg_playtime, map_avg_playercount_change = load_map_data(directory, map_name)
 
         if not is_found:
             return flask.jsonify("Requested map not found"), 404
