@@ -3,6 +3,7 @@ import pathlib
 from monitor import get_monitor_version
 from data_load import *
 
+DEVELOPMENT = False
 API_VERSION = "3.0.4"
 MONITOR_SERVERS = [
     "Overcast Community"
@@ -125,4 +126,7 @@ def map_data(server_name, map_name):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=7000)
+    if DEVELOPMENT:
+        app.run(host="127.0.0.1", port=7000)
+    else:
+        app.run(host="0.0.0.0", port=7000)
