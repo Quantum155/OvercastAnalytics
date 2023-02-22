@@ -9,7 +9,7 @@ import discord
 import dotenv
 import pathlib
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 # Env setup
 dotenv.load_dotenv()
@@ -36,7 +36,7 @@ async def on_ready():
     await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send(
         "[STARTUP] QuanteeyAPI Overcast link in UP")
     # Make sure backup savefiles exist
-    pathlib.Path("save/Overcast Community").mkdir(parents=True, exist_ok=True)
+    pathlib.Path("../../../save/Overcast Community").mkdir(parents=True, exist_ok=True)
     backup_save.touch()
 
 
