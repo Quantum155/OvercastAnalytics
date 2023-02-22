@@ -5,15 +5,19 @@ import json
 
 
 class SetNotifications(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.config = pathlib.Path("config")
         self.config.touch()
 
     @discord.slash_command()
-    async def set_notifications(self, interaction: discord.Interaction,
-                                group: discord.Role, after: int, message: str):
+    async def set_notifications(
+        self,
+        interaction: discord.Interaction,
+        group: discord.Role,
+        after: int,
+        message: str,
+    ):
         """
         Set notification settings for a server.
         :param interaction: (Provided by discord)
@@ -27,14 +31,15 @@ class SetNotifications(commands.Cog):
             "group": group.id,
             "after": after,
             "channel": interaction.channel.id,
-            "message": message
+            "message": message,
         }
 
         with open(self.config, "w") as file:
             json.dump(configs, file, indent=4)
 
         await interaction.response.send_message(
-            f"Set notification settings for **{interaction.guild.name}**")
+            f"Set notification settings for **{interaction.guild.name}**"
+        )
 
 
 def setup(bot):

@@ -37,14 +37,14 @@ def format_seconds(seconds: int) -> str:
 
 
 class CurrentMap(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
     @discord.slash_command()
     async def current_map(self, interaction: discord.Interaction):
         api_response = requests.get(
-            "https://quanteey.xyz/Overcast%20Community/current_map/")
+            "https://quanteey.xyz/Overcast%20Community/current_map/"
+        )
         if api_response.status_code == 200:
             current_map = api_response.json()["current_map"]
             is_event = api_response.json()["event"]
@@ -56,11 +56,13 @@ class CurrentMap(commands.Cog):
             await interaction.response.send_message(
                 f"Current map: **{current_map}**\n"
                 f"Event: **{is_event}**\n"
-                f"Game time: **{format_seconds(game_time)}**")
+                f"Game time: **{format_seconds(game_time)}**"
+            )
         else:
             await interaction.response.send_message(
                 f"Quanteey API is not online / failed:"
-                f" error {api_response.status_code}")
+                f" error {api_response.status_code}"
+            )
 
 
 def setup(bot):
