@@ -2,7 +2,7 @@ import os
 import discord
 import dotenv
 
-VERSION = "dev0"
+VERSION = "1.0.0"
 
 # Env setup
 dotenv.load_dotenv()
