@@ -156,8 +156,8 @@ class ServerMonitor:
                     6:-4
                 ]  # Get the map name out from OCC's MOTD
             except (
-                Exception
-            ) as ex:  # skipcq: PYL-W0703 - We want to catch every exception
+                Exception  # skipcq: PYL-W0703 - We want to catch every exception
+            ) as ex:
                 print(f"[ERROR] Unable to query server: {ex}")
                 active_map_name = "SYS_QUERYERROR"
                 players = 0
