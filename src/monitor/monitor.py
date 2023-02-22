@@ -3,7 +3,7 @@ from time import sleep
 import datetime
 import pathlib
 
-MONITOR_VERSION = "2.0.4"
+MONITOR_VERSION = "2.0.5"
 
 
 def get_monitor_version():
@@ -93,7 +93,7 @@ class ServerMonitor:
 
     Methods:
     tick()
-        Should be ran once every second. It queries the server, and if a new map is found, it sets the pending_map to
+        This should run once every second. It queries the server, and if a new map is found, it sets the pending_map to
         the Match object
     get_pending_map()
         returns the pending map
@@ -225,19 +225,19 @@ class DataWriter:
         :param server_name Name of the server. Used in naming the folder.
         :param verbose Display debug information (Default is False)
         """
-        self._history_file = pathlib.Path(f"save/{server_name}/map_history")
-        self._map_data = pathlib.Path(f"save/{server_name}/map_data")
-        self._active_map = pathlib.Path(f"save/{server_name}/active_map")
-        self._game_time = pathlib.Path(f"save/{server_name}/game_time")
-        self._first_write = pathlib.Path(f"save/{server_name}/first_write")
-        self._online_players = pathlib.Path(f"save/{server_name}/online")
-        self._misc_data = pathlib.Path(f"save/{server_name}/misc")
+        self._history_file = pathlib.Path(f"../../save/{server_name}/map_history")
+        self._map_data = pathlib.Path(f"../../save/{server_name}/map_data")
+        self._active_map = pathlib.Path(f"../../save/{server_name}/active_map")
+        self._game_time = pathlib.Path(f"../../save/{server_name}/game_time")
+        self._first_write = pathlib.Path(f"../../save/{server_name}/first_write")
+        self._online_players = pathlib.Path(f"../../save/{server_name}/online")
+        self._misc_data = pathlib.Path(f"../../save/{server_name}/misc")
         self._player_history = pathlib.Path(
-            f"save/{server_name}/player_history")
+            f"../../save/{server_name}/player_history")
         self._verbose = verbose
 
         # Make sure files exists
-        pathlib.Path(f"save/{server_name}").mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f"../../save/{server_name}").mkdir(parents=True, exist_ok=True)
         self._history_file.touch()
         self._map_data.touch()
         self._active_map.touch()
@@ -345,7 +345,7 @@ class DataAnalyzer:
 
     def __init__(self, server_save_name, analyze_cooldown=43200):
         """
-        :param server_save_name The name of the folder the server data is saved to (save/<name>)
+        :param server_save_name The name of the folder the server data is saved to (../../save/<name>)
         :param analyze_cooldown: Run caching every x seconds
         """
         self._server_save_name = server_save_name
@@ -353,17 +353,17 @@ class DataAnalyzer:
         self._cooldown = 0
 
         self._map_history = pathlib.Path(
-            f"save/{self._server_save_name}/map_history")
+            f"../../save/{self._server_save_name}/map_history")
         self._save_file = pathlib.Path(
-            f"save/{self._server_save_name}/map_average_cache")
+            f"../../save/{self._server_save_name}/map_average_cache")
         self._last_cache_save = pathlib.Path(
-            f"save/{self._server_save_name}/last_cache_time")
+            f"../../save/{self._server_save_name}/last_cache_time")
 
         self._maps = [
         ]  # This list will store the Match objects that will be returned after reading the file
 
         # Make sure files exist
-        pathlib.Path(f"save/{self._server_save_name}").mkdir(parents=True,
+        pathlib.Path(f"../../save/{self._server_save_name}").mkdir(parents=True,
                                                              exist_ok=True)
         self._map_history.touch()
         self._save_file.touch()
@@ -424,7 +424,7 @@ class DataAnalyzer:
 
 if __name__ == "__main__":
     # Example run
-    print(f"Started - Saving to {str(pathlib.Path('save/'))} ")
+    print(f"Started - Saving to {str(pathlib.Path('../../save/'))} ")
 
     occmonitor = ServerMonitor("play.oc.tc", verbose=True, query_time=10)
     occwriter = DataWriter("Overcast Community", verbose=True)
