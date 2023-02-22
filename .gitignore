@@ -1,6 +1,6 @@
 /venv/
 /.idea/
 /save/
-/.env
-/extensions/OvercastNotify/.env
-/extensions/OvercastNotify/config
+
+**/*.env
+**/*config
