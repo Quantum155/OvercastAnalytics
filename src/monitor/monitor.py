@@ -176,8 +176,12 @@ class ServerMonitor:
             if self._prev_map != active_map_name:
                 if "§" in active_map_name:
                     self._is_event = True
+                else:
+                    self._is_event = False
                 if self._verbose:
                     print(f"New map detected. {self._prev_map} >> {active_map_name}")
+
+                self._start_time = datetime.datetime.now()
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(
