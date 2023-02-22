@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import requests
 import pathlib
 import json
-from src.cogs.current_map import format_seconds  # noqa
+from cogs.current_map import format_seconds  # noqa
 
 
 class CheckForNotify(commands.Cog):
