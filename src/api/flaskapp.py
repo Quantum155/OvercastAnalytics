@@ -7,7 +7,7 @@ DEVELOPMENT = False
 API_VERSION = "3.0.5"
 MONITOR_SERVERS = [
     "Overcast Community"
-]  # Folders inside ../../save/ from where the API can serve data.
+]  # Folders inside ../../save/ from where the API can serve data from.
 
 
 def has_access(server):
