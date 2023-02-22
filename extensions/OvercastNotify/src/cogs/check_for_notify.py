@@ -7,7 +7,6 @@ from src.cogs.current_map import format_seconds  # noqa
 
 
 class CheckForNotify(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.config = pathlib.Path("config")
@@ -33,15 +32,18 @@ class CheckForNotify(commands.Cog):
     @tasks.loop(seconds=20)
     async def check_for_notify(self):
         api_response = requests.get(
-            "https://quanteey.xyz/Overcast%20Community/current_map/")
+            "https://quanteey.xyz/Overcast%20Community/current_map/"
+        )
         if api_response.status_code == 200:
             current_map = api_response.json()["current_map"]
             is_event = api_response.json()["event"]
             game_time = api_response.json()["game_time"]
             if not is_event:
                 for key, value in self.configs.items():
-                    if (not self.is_notified[key]
-                            and game_time >= self.configs[key]["after"]):
+                    if (
+                        not self.is_notified[key]
+                        and game_time >= self.configs[key]["after"]
+                    ):
                         self.is_notified[key] = True
                         self.tracking_changes[key] = current_map
                         await self.bot.get_guild(int(key)).get_channel(
