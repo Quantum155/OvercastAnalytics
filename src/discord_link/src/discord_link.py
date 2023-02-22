@@ -17,7 +17,8 @@ TOKEN = str(os.getenv("TOKEN"))
 GUILD = int(os.getenv("GUILD"))
 TEST_CHANNEL = int(os.getenv("TEST_CHANNEL"))
 
-backup_save = pathlib.Path("../../../save/Overcast Community/backup_current_map.txt")
+backup_save = pathlib.Path(
+    "../../../save/Overcast Community/backup_current_map.txt")
 
 # Bot setup
 intents = discord.Intents.default()
@@ -36,7 +37,8 @@ async def on_ready():
     await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send(
         "[STARTUP] QuanteeyAPI Overcast link in UP")
     # Make sure backup savefiles exist
-    pathlib.Path("../../../save/Overcast Community").mkdir(parents=True, exist_ok=True)
+    pathlib.Path("../../../save/Overcast Community").mkdir(parents=True,
+                                                           exist_ok=True)
     backup_save.touch()
 
 
