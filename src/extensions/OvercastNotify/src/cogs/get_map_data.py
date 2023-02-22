@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import requests
-from src.cogs.current_map import format_seconds  # noqa
+from cogs.current_map import format_seconds  # noqa
 
 
 class MapData(commands.Cog):

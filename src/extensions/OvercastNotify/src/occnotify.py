@@ -2,7 +2,7 @@ import os
 import discord
 import dotenv
 
-VERSION = "dev0"
+VERSION = "1.0.1"
 
 # Env setup
 dotenv.load_dotenv()
@@ -13,11 +13,11 @@ intents = discord.Intents.default()
 bot = discord.Bot(intents=intents)
 
 # Load extensions
-bot.load_extension("src.cogs.status")
-bot.load_extension("src.cogs.current_map")
-bot.load_extension("src.cogs.check_for_notify")
-bot.load_extension("src.cogs.set_notifications")
-bot.load_extension("src.cogs.get_map_data")
+bot.load_extension("cogs.status")
+bot.load_extension("cogs.current_map")
+bot.load_extension("cogs.check_for_notify")
+bot.load_extension("cogs.set_notifications")
+bot.load_extension("cogs.get_map_data")
 
 
 # Events

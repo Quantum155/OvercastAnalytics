@@ -1,13 +1,13 @@
 import flask
 import pathlib
-from monitor import get_monitor_version
+from src.monitor.monitor import get_monitor_version
 from data_load import *
 
 DEVELOPMENT = False
-API_VERSION = "3.0.4"
+API_VERSION = "3.0.5"
 MONITOR_SERVERS = [
     "Overcast Community"
-]  # Folders inside /save/ from where the API can serve data.
+]  # Folders inside ../../save/ from where the API can serve data from.
 
 
 def has_access(server):
@@ -44,7 +44,7 @@ def server_data(server_name):
     if not has_access(server_name):
         return flask.jsonify("Requested server not found or forbidden"), 403
 
-    directory = pathlib.Path(f"save/{server_name}")
+    directory = pathlib.Path(f"../../save/{server_name}")
 
     if directory.is_dir():
         monitoring_since, last_cache, maps_tracked = load_server_data(directory)
@@ -71,7 +71,7 @@ def current_map(server_name):
     if not has_access(server_name):
         return flask.jsonify("Requested server not found or forbidden"), 403
 
-    directory = pathlib.Path(f"save/{server_name}")
+    directory = pathlib.Path(f"../../save/{server_name}")
 
     if directory.is_dir():
         active_map = load_active_map(directory)
@@ -100,7 +100,7 @@ def map_data(server_name, map_name):
     if not has_access(server_name):
         return flask.jsonify("Requested server not found or forbidden"), 403
 
-    directory = pathlib.Path(f"save/{server_name}")
+    directory = pathlib.Path(f"../../save/{server_name}")
 
     if directory.is_dir():
         # Load data for map
