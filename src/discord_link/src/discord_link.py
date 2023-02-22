@@ -35,7 +35,8 @@ bot.load_extension("cogs.status")
 async def on_ready():
     print("Ready!")
     await bot.get_guild(GUILD).get_channel(TEST_CHANNEL).send(
-        "[STARTUP] QuanteeyAPI Overcast link in UP")
+        "[STARTUP] QuanteeyAPI Overcast link in UP"
+    )
     # Make sure backup savefiles exist
     pathlib.Path("../../../save/Overcast Community").mkdir(parents=True,
                                                            exist_ok=True)

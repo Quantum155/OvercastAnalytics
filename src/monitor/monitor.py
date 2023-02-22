@@ -15,8 +15,9 @@ class TimedData:
     Basic class for storing everything that needs to be saved periodically, rather than at the end of the game
     """
 
-    def __init__(self, online_players: list, is_complete: False,
-                 playercount: int, game_time: int):
+    def __init__(
+        self, online_players: list, is_complete: False, playercount: int, game_time: int
+    ):
         self.playercount = playercount
         self.online_players = online_players
         self._is_complete = is_complete  # Is the data complete (as a result of a query instead of a status check)
@@ -34,8 +35,15 @@ class Match:
     Basic class for storing all data related to a recently played map.
     """
 
-    def __init__(self, start_date: datetime.datetime, playtime, name,
-                 start_players, end_players, is_event: bool):
+    def __init__(
+        self,
+        start_date: datetime.datetime,
+        playtime,
+        name,
+        start_players,
+        end_players,
+        is_event: bool,
+    ):
         self.start_date = start_date
         self.playtime = playtime
         self.name = name
@@ -56,10 +64,7 @@ class Map:
     Also has functions to calculate the data.
     """
 
-    def __init__(self,
-                 map_name,
-                 average_playtime=None,
-                 average_player_change=None):
+    def __init__(self, map_name, average_playtime=None, average_player_change=None):
         self.map_name = map_name
         self.average_playtime = average_playtime
         self.average_player_change = average_player_change
@@ -76,7 +81,8 @@ class Map:
     def calculate_average_player_changes(self):
         if len(self._player_changes) > 0:
             self.average_player_change = sum(self._player_changes) / len(
-                self._player_changes)
+                self._player_changes
+            )
         else:
             pass
 
@@ -110,7 +116,8 @@ class ServerMonitor:
         self._verbose = verbose
 
         self._prev_map = "SYS_INIT"
-        self._start_time = datetime.datetime.now(
+        self._start_time = (
+            datetime.datetime.now()
         )  # This will store the time the last map started.
         self._current_playtime = 0
         self._starting_players = 0
@@ -146,19 +153,23 @@ class ServerMonitor:
                 players = status.players.online
                 self._online_players = status.players.sample
                 active_map_name = motd.splitlines()[1][
-                    6:-4]  # Get the map name out from OCC's MOTD
-            except Exception as ex:  # skipcq: PYL-W0703 - We want to catch every exception
+                    6:-4
+                ]  # Get the map name out from OCC's MOTD
+            except (
+                Exception  # skipcq: PYL-W0703 - We want to catch every exception
+            ) as ex:
                 print(f"[ERROR] Unable to query server: {ex}")
                 active_map_name = "SYS_QUERYERROR"
                 players = 0
                 self._online_players = []
 
             # Create timed objects
-            self._timed_data = TimedData(self._online_players,
-                                         is_complete=False,
-                                         playercount=players,
-                                         game_time=self._current_playtime *
-                                         self._query_time)
+            self._timed_data = TimedData(
+                self._online_players,
+                is_complete=False,
+                playercount=players,
+                game_time=self._current_playtime * self._query_time,
+            )
             self._is_timed_data_pending = True
 
             # Check if the current map is different from the one we got last query
@@ -166,26 +177,29 @@ class ServerMonitor:
                 if "§" in active_map_name:
                     self._is_event = True
                 if self._verbose:
-                    print(
-                        f"New map detected. {self._prev_map} >> {active_map_name}"
-                    )
+                    print(f"New map detected. {self._prev_map} >> {active_map_name}")
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(
                     self._start_time,
-                    self._current_playtime * self._query_time, self._prev_map,
-                    self._starting_players, players, self._is_event)
+                    self._current_playtime * self._query_time,
+                    self._prev_map,
+                    self._starting_players,
+                    players,
+                    self._is_event,
+                )
                 self._is_pending = True
 
                 if self._verbose:
-                    print(
-                        f"------- Finished map -------\n > {self._prev_map} <")
+                    print(f"------- Finished map -------\n > {self._prev_map} <")
                     print(f"Start time: {str(self._start_time)}")
                     print(
                         f"Playtime: {self._current_playtime * self._query_time} seconds."
                     )
-                    print(f"Players at end: {players} \
-                            [{players - self._starting_players:+g}]")
+                    print(
+                        f"Players at end: {players} \
+                            [{players - self._starting_players:+g}]"
+                    )
                     print(f"Is event: {self._is_event}")
                     print("---------------------------------\n")
 
@@ -274,9 +288,7 @@ class DataWriter:
                     ptime = _match.playtime
                     splayers = _match.start_players
                     pchange = _match.get_player_change()
-                    file.write(
-                        f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n"
-                    )
+                    file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
             else:
                 # Writing map history
                 if self._verbose:
@@ -287,9 +299,7 @@ class DataWriter:
                     ptime = _match.playtime
                     splayers = _match.start_players
                     pchange = _match.get_player_change()
-                    file.write(
-                        f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n"
-                    )
+                    file.write(f"{name} | {stime} | {ptime} | {splayers} | {pchange}\n")
 
                 if self._verbose:
                     print("Starting the save - Active map")
@@ -332,8 +342,12 @@ class DataWriter:
                 for item in timed.get_player_names():
                     file.write(str(item) + "\n")
             with open(self._player_history, "a") as file:
-                file.write(datetime.datetime.now().isoformat() + "|" +
-                           str(timed.playercount) + "|")
+                file.write(
+                    datetime.datetime.now().isoformat()
+                    + "|"
+                    + str(timed.playercount)
+                    + "|"
+                )
                 for item in timed.get_player_names():
                     file.write(str(item) + "|")
                 file.write("\n")
@@ -362,8 +376,9 @@ class DataAnalyzer:
         self._last_cache_save = pathlib.Path(
             f"../../save/{self._server_save_name}/last_cache_time")
 
-        self._maps = [
-        ]  # This list will store the Match objects that will be returned after reading the file
+        self._maps = (
+            []
+        )  # This list will store the Match objects that will be returned after reading the file
 
         # Make sure files exist
         pathlib.Path(f"../../save/{self._server_save_name}").mkdir(

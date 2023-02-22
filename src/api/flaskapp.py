@@ -24,12 +24,14 @@ def index():
     """
     This gets information about the API and Monitor.
     """
-    return flask.jsonify({
-        "api_version": API_VERSION,
-        "monitor_version": get_monitor_version(),
-        "monitored_server_count": len(MONITOR_SERVERS),
-        "monitored_servers": MONITOR_SERVERS
-    })
+    return flask.jsonify(
+        {
+            "api_version": API_VERSION,
+            "monitor_version": get_monitor_version(),
+            "monitored_server_count": len(MONITOR_SERVERS),
+            "monitored_servers": MONITOR_SERVERS,
+        }
+    )
 
 
 @app.route("/<string:server_name>/", methods=["GET"])
@@ -45,17 +47,18 @@ def server_data(server_name):
     directory = pathlib.Path(f"../../save/{server_name}")
 
     if directory.is_dir():
-        monitoring_since, last_cache, maps_tracked = load_server_data(
-            directory)
+        monitoring_since, last_cache, maps_tracked = load_server_data(directory)
         player_sample = load_players(directory)
         # Return response
-        return flask.jsonify({
-            "name": server_name,
-            "monitoring_since": monitoring_since,
-            "last_cache_update": last_cache,
-            "maps_tracked": maps_tracked,
-            "player_sample": player_sample
-        })
+        return flask.jsonify(
+            {
+                "name": server_name,
+                "monitoring_since": monitoring_since,
+                "last_cache_update": last_cache,
+                "maps_tracked": maps_tracked,
+                "player_sample": player_sample,
+            }
+        )
     return flask.jsonify("Requested server not found"), 404
 
 
@@ -81,11 +84,9 @@ def current_map(server_name):
             #  (Also, it's hard to avoid it without a major refactor)
             active_map = load_occ_backup_data()
         game_time = load_game_time(directory)
-        return flask.jsonify({
-            "current_map": active_map,
-            "game_time": game_time,
-            "event": event
-        })
+        return flask.jsonify(
+            {"current_map": active_map, "game_time": game_time, "event": event}
+        )
     return flask.jsonify("Requested server not found"), 404
 
 
@@ -103,29 +104,30 @@ def map_data(server_name, map_name):
 
     if directory.is_dir():
         # Load data for map
-        is_found, cached_data_found, map_playcount, map_avg_playtime, map_avg_playercount_change = load_map_data(
-            directory, map_name)
+        (
+            is_found,
+            cached_data_found,
+            map_playcount,
+            map_avg_playtime,
+            map_avg_playercount_change,
+        ) = load_map_data(directory, map_name)
 
         if not is_found:
             return flask.jsonify("Requested map not found"), 404
-        return flask.jsonify({
-            "server_name":
-            server_name,
-            "map_name":
-            map_name,
-            "found_in_cache":
-            cached_data_found,
-            "playcount":
-            map_playcount,
-            "map_avg_playtime":
-            map_avg_playtime,
-            "map_avg_playercount_change":
-            map_avg_playercount_change
-        })
+        return flask.jsonify(
+            {
+                "server_name": server_name,
+                "map_name": map_name,
+                "found_in_cache": cached_data_found,
+                "playcount": map_playcount,
+                "map_avg_playtime": map_avg_playtime,
+                "map_avg_playercount_change": map_avg_playercount_change,
+            }
+        )
     return flask.jsonify("Requested server not found"), 404
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if DEVELOPMENT:
         app.run(host="127.0.0.1", port=7000)
     else:

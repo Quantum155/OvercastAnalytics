@@ -1,7 +1,8 @@
 def load_map_data(directory, map_name):
     is_found = False
-    with open((directory / "map_data"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "map_data"), "r"
+    ) as file:
         data = file.read()
 
         map_playcount = 0
@@ -18,8 +19,9 @@ def load_map_data(directory, map_name):
 
     # Load cached data, if any
     cached_data_found = False
-    with open((directory / "map_average_cache"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "map_average_cache"), "r"
+    ) as file:
         data = file.read()
 
         map_avg_playtime = 0
@@ -37,21 +39,29 @@ def load_map_data(directory, map_name):
                 map_avg_playercount_change = pcount_change
                 break
 
-    return is_found, cached_data_found, map_playcount, map_avg_playtime, map_avg_playercount_change
+    return (
+        is_found,
+        cached_data_found,
+        map_playcount,
+        map_avg_playtime,
+        map_avg_playercount_change,
+    )
 
 
 def load_server_data(directory):
     # Read files
-    with open((directory / "first_write"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "first_write"), "r"
+    ) as file:
         monitoring_since = file.read()
-    with open((directory / "last_cache_time"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "last_cache_time"), "r"
+    ) as file:
         last_cache = file.read()
     # Count number of maps in file
     invalid = 0
     count = None
-    with open((directory / "map_data"), 'r') as fp:
+    with open((directory / "map_data"), "r") as fp:
         for count, line in enumerate(fp):
             if line.startswith("SYS_"):
                 invalid += 1
@@ -61,20 +71,23 @@ def load_server_data(directory):
 
 
 def load_active_map(directory):
-    with open((directory / "active_map"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "active_map"), "r"
+    ) as file:
         return file.read()
 
 
 def load_game_time(directory):
-    with open((directory / "game_time"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "game_time"), "r"
+    ) as file:
         return int(file.read().strip())
 
 
 def load_players(directory):
-    with open((directory / "online"),
-              "r") as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        (directory / "online"), "r"
+    ) as file:
         players = []
         for line in file.readlines():
             players.append(line.strip())
@@ -82,6 +95,7 @@ def load_players(directory):
 
 
 def load_occ_backup_data():
-    with open("save/Overcast Community/backup_current_map.txt"
-              ) as file:  # noqa - safety is checked elsewhere
+    with open(  # noqa - safety is checked elsewhere
+        "save/Overcast Community/backup_current_map.txt"
+    ) as file:
         return file.read().strip()
