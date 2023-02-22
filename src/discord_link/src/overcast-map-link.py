@@ -17,7 +17,7 @@ TOKEN = str(os.getenv("TOKEN"))
 GUILD = int(os.getenv("GUILD"))
 TEST_CHANNEL = int(os.getenv("TEST_CHANNEL"))
 
-backup_save = pathlib.Path("save/Overcast Community/backup_current_map.txt")
+backup_save = pathlib.Path("../../../save/Overcast Community/backup_current_map.txt")
 
 # Bot setup
 intents = discord.Intents.default()
@@ -26,7 +26,7 @@ intents.message_content = True
 bot = discord.Bot(intents=intents)
 
 # Load extensions
-bot.load_extension("dcmaplink.src.cogs.status")
+bot.load_extension("cogs.status")
 
 
 # Events

@@ -1,6 +1,6 @@
 import flask
 import pathlib
-from monitor import get_monitor_version
+from src.monitor.monitor import get_monitor_version
 from data_load import *
 
 DEVELOPMENT = False
