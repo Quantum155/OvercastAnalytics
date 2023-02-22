@@ -181,9 +181,7 @@ class ServerMonitor:
                 if self._verbose:
                     print(f"New map detected. {self._prev_map} >> {active_map_name}")
 
-                self._start_time = (
-                    datetime.datetime.now()
-                )
+                self._start_time = datetime.datetime.now()
 
                 # Create the Match object, and print some data if verbose
                 self._pending_map = Match(
