@@ -27,6 +27,7 @@ bot = discord.Bot(intents=intents)
 
 # Load extensions
 bot.load_extension("cogs.status")
+bot.load_extension("cogs.heartbeat")
 
 
 # Events
