@@ -4,7 +4,7 @@ from src.monitor.monitor import get_monitor_version
 from data_load import *
 
 DEVELOPMENT = False
-API_VERSION = "3.0.5"
+API_VERSION = "3.0.6"
 MONITOR_SERVERS = [
     "Overcast Community"
 ]  # Folders inside ../../save/ from where the API can serve data from.
@@ -82,7 +82,7 @@ def current_map(server_name):
             #  Always use the more reliable cloudy source (that comes from Cloudy)
             #  This is a terrible implementation, but it works.
             #  (Also, it's hard to avoid it without a major refactor)
-            active_map = load_occ_backup_data()
+            active_map = load_occ_backup_data(directory)
         game_time = load_game_time(directory)
         return flask.jsonify(
             {"current_map": active_map, "game_time": game_time, "event": event}
