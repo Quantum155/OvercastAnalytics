@@ -96,6 +96,6 @@ def load_players(directory):
 
 def load_occ_backup_data(directory):
     with open(  # noqa - safety is checked elsewhere
-            (directory / "backup_current_map.txt")
+        (directory / "backup_current_map.txt")
     ) as file:
         return file.read().strip()
