@@ -78,11 +78,10 @@ def current_map(server_name):
         event = False
         if active_map == "SYS_EVENT":
             event = True
-        if server_name == "Overcast Community":
-            #  Always use the more reliable cloudy source (that comes from Cloudy)
-            #  This is a terrible implementation, but it works.
-            #  (Also, it's hard to avoid it without a major refactor)
-            active_map = load_occ_backup_data(directory)
+            if server_name == "Overcast Community":
+                #  This is a terrible implementation, but it works.
+                #  (Also, it's hard to avoid it without a major refactor)
+                active_map = load_occ_backup_data(directory)
         game_time = load_game_time(directory)
         return flask.jsonify(
             {"current_map": active_map, "game_time": game_time, "event": event}
