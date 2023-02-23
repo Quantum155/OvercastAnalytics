@@ -4,3 +4,4 @@
 A suite of tools to track maps and players on OCC, and allow access to this data via an API, discord bots, and other things.
 
 See the API in action: https://quanteey.xyz/
+The API documentation is in ./documentation.md
