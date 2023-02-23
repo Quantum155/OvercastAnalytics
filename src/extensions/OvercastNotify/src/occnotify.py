@@ -18,6 +18,7 @@ bot.load_extension("cogs.current_map")
 bot.load_extension("cogs.check_for_notify")
 bot.load_extension("cogs.set_notifications")
 bot.load_extension("cogs.get_map_data")
+bot.load_extension("cogs.heartbeat")
 
 
 # Events
